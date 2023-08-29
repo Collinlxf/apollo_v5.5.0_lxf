@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,8 +18,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning:planning_component_lib",
-        "//modules/planning/proto:dp_st_speed_config_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -60,6 +60,7 @@ cc_test(
         "//modules/map/data:map_sunnyvale_big_loop",
         "//modules/planning:planning_testdata",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":planning_test_base",
     ],

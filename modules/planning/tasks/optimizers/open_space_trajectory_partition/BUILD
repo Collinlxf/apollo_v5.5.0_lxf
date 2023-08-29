@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/status",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:trajectory_optimizer",
     ],
@@ -23,7 +24,7 @@ cc_test(
     srcs = ["open_space_trajectory_partition_test.cc"],
     deps = [
         ":open_space_trajectory_partition",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

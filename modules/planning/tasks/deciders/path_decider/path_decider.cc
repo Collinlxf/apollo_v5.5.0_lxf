@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 
+#include <memory>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"
@@ -33,7 +35,9 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 
-PathDecider::PathDecider(const TaskConfig &config) : Task(config) {}
+PathDecider::PathDecider(const TaskConfig &config,
+                         const std::shared_ptr<DependencyInjector> &injector)
+    : Task(config, injector) {}
 
 Status PathDecider::Execute(Frame *frame,
                             ReferenceLineInfo *reference_line_info) {
@@ -55,8 +59,9 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
     blocking_obstacle_id = reference_line_info->GetBlockingObstacle()->Id();
   }
   if (!MakeObjectDecision(path_data, blocking_obstacle_id, path_decision)) {
-    AERROR << "Failed to make decision based on tunnel";
-    return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
+    const std::string msg = "Failed to make decision based on tunnel";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
 }
@@ -79,7 +84,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, const std::string &blocking_obstacle_id,
     PathDecision *const path_decision) {
   // Sanity checks and get important values.
-  CHECK(path_decision);
+  ACHECK(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
     AERROR << "Path is empty.";
@@ -114,7 +119,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
     // - add STOP decision for blocking obstacles.
     if (obstacle->Id() == blocking_obstacle_id &&
-        !PlanningContext::Instance()
+        !injector_->planning_context()
              ->planning_status()
              .path_decider()
              .is_in_path_lane_borrow_scenario()) {

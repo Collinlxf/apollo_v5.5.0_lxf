@@ -20,21 +20,19 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/dp_road_graph.h"
 
-#include "cyber/task/task.h"
-
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/proto/planning_status.pb.h"
-
 #include "cyber/common/log.h"
+#include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/proto/error_code.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -107,7 +105,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
 bool DpRoadGraph::GenerateMinCostPath(
     const std::vector<const Obstacle *> &obstacles,
     std::vector<DpRoadGraphNode> *min_cost_path) {
-  CHECK(min_cost_path != nullptr);
+  ACHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
   if (!waypoint_sampler_->SamplePathWaypoints(init_point_, &path_waypoints) ||

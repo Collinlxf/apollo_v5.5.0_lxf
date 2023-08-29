@@ -21,11 +21,11 @@
 #pragma once
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Dense"
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -46,7 +46,8 @@ namespace apollo {
 namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
-  explicit OpenSpaceRoiDecider(const TaskConfig &config);
+  OpenSpaceRoiDecider(const TaskConfig &config,
+                      const std::shared_ptr<DependencyInjector> &injector);
 
  private:
   apollo::common::Status Process(Frame *frame) override;
@@ -75,6 +76,19 @@ class OpenSpaceRoiDecider : public Decider {
 
   // @brief Get road boundaries of both sides
   void GetRoadBoundary(
+      const hdmap::Path &nearby_path, const double center_line_s,
+      const common::math::Vec2d &origin_point, const double origin_heading,
+      std::vector<common::math::Vec2d> *left_lane_boundary,
+      std::vector<common::math::Vec2d> *right_lane_boundary,
+      std::vector<common::math::Vec2d> *center_lane_boundary_left,
+      std::vector<common::math::Vec2d> *center_lane_boundary_right,
+      std::vector<double> *center_lane_s_left,
+      std::vector<double> *center_lane_s_right,
+      std::vector<double> *left_lane_road_width,
+      std::vector<double> *right_lane_road_width);
+
+  // @brief Get the Road Boundary From Map object
+  void GetRoadBoundaryFromMap(
       const hdmap::Path &nearby_path, const double center_line_s,
       const common::math::Vec2d &origin_point, const double origin_heading,
       std::vector<common::math::Vec2d> *left_lane_boundary,

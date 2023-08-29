@@ -33,7 +33,7 @@ using apollo::common::math::Vec2d;
 STBoundary::STBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs,
     bool is_accurate_boundary) {
-  CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
+  ACHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
   if (!is_accurate_boundary) {
@@ -425,11 +425,11 @@ bool STBoundary::IsValid(
       const auto& next_upper = point_pairs[i + 1].second;
       if (std::fmax(curr_lower.t(), curr_upper.t()) + kMinDeltaT >=
           std::fmin(next_lower.t(), next_upper.t())) {
-        AERROR << "Latter points should have larger t:";
-        AERROR << " curr_lower: " << curr_lower.DebugString();
-        AERROR << " curr_upper: " << curr_upper.DebugString();
-        AERROR << " next_lower: " << next_lower.DebugString();
-        AERROR << " next_upper: " << next_upper.DebugString();
+        AERROR << "Latter points should have larger t: "
+               << "curr_lower[" << curr_lower.DebugString()
+               << "] curr_upper[" << curr_upper.DebugString()
+               << "] next_lower[" << next_lower.DebugString()
+               << "] next_upper[" << next_upper.DebugString() << "]";
         return false;
       }
     }

@@ -24,8 +24,8 @@
 #include <utility>
 #include <vector>
 
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"

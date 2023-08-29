@@ -20,8 +20,6 @@
 
 DECLARE_bool(planning_test_mode);
 
-DECLARE_string(planning_config_file);
-
 DECLARE_int32(history_max_record_num);
 DECLARE_int32(max_frame_history_num);
 
@@ -30,13 +28,14 @@ DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_emergency_pull_over_config_file);
 DECLARE_string(scenario_emergency_stop_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
+DECLARE_string(scenario_lane_follow_hybrid_config_file);
+DECLARE_string(scenario_learning_model_sample_config_file);
 DECLARE_string(scenario_narrow_street_u_turn_config_file);
 DECLARE_string(scenario_park_and_go_config_file);
 DECLARE_string(scenario_pull_over_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
-DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_valet_parking_config_file);
 DECLARE_string(scenario_yield_sign_config_file);
@@ -210,6 +209,8 @@ DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
 
 DECLARE_double(speed_bump_speed_limit);
+DECLARE_double(default_city_road_speed_limit);
+DECLARE_double(default_highway_speed_limit);
 
 // navigation mode
 DECLARE_bool(enable_planning_pad_msg);
@@ -228,7 +229,6 @@ DECLARE_bool(use_s_curve_speed_smooth);
 DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 
-DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
@@ -264,3 +264,18 @@ DECLARE_bool(use_smoothed_dp_guide_line);
 DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
 
 DECLARE_bool(use_front_axe_center_in_path_planning);
+
+DECLARE_bool(use_road_boundary_from_map);
+
+// learning related
+DECLARE_bool(planning_offline_learning);
+DECLARE_string(planning_data_dir);
+DECLARE_string(planning_offline_bags);
+DECLARE_int32(learning_data_obstacle_history_time_sec);
+DECLARE_int32(learning_data_frame_num_per_file);
+DECLARE_string(planning_birdview_img_feature_renderer_config_file);
+DECLARE_int32(min_past_history_points_len);
+
+// hybrid model
+DECLARE_bool(skip_path_reference_in_side_pass);
+DECLARE_bool(skip_path_reference_in_change_lane);

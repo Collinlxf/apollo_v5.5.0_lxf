@@ -19,16 +19,17 @@
  */
 
 #pragma once
+
+#include <adolc/adolc.h>
+#include <adolc/adolc_openmp.h>
+#include <adolc/adolc_sparse.h>
+#include <adolc/adouble.h>
 #include <omp.h>
+
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
+
 #include "Eigen/Dense"
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
-
-#include "adolc/adolc.h"
-#include "adolc/adolc_openmp.h"
-#include "adolc/adolc_sparse.h"
-#include "adolc/adouble.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"

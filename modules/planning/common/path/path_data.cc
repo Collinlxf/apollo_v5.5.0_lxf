@@ -33,6 +33,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::PathPoint;
+using apollo::common::PointENU;
 using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::util::PointFactory;
@@ -49,7 +51,6 @@ bool PathData::SetDiscretizedPath(DiscretizedPath path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -65,7 +66,6 @@ bool PathData::SetFrenetPath(FrenetFramePath frenet_path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -103,11 +103,6 @@ bool PathData::Empty() const {
   return discretized_path_.empty() && frenet_path_.empty();
 }
 
-std::list<std::pair<DiscretizedPath, FrenetFramePath>>
-    &PathData::path_data_history() {
-  return path_data_history_;
-}
-
 void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
   Clear();
   reference_line_ = reference_line;
@@ -119,7 +114,7 @@ common::PathPoint PathData::GetPathPointWithPathS(const double s) const {
 
 bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
@@ -158,6 +153,7 @@ void PathData::Clear() {
   discretized_path_.clear();
   frenet_path_.clear();
   path_point_decision_guide_.clear();
+  path_reference_.clear();
   reference_line_ = nullptr;
 }
 
@@ -214,7 +210,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
 bool PathData::XYToSL(const DiscretizedPath &discretized_path,
                       FrenetFramePath *const frenet_path) {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path) {
@@ -241,7 +237,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
 }
 
 bool PathData::LeftTrimWithRefS(const common::FrenetFramePoint &frenet_point) {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   frenet_frame_points.emplace_back(frenet_point);
 
@@ -265,6 +261,15 @@ bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
 void PathData::set_path_label(const std::string &label) { path_label_ = label; }
 
 const std::string &PathData::path_label() const { return path_label_; }
+
+const std::vector<PathPoint> &PathData::path_reference() const {
+  return path_reference_;
+}
+
+void PathData::set_path_reference(
+    const std::vector<PathPoint> &path_reference) {
+  path_reference_ = std::move(path_reference);
+}
 
 }  // namespace planning
 }  // namespace apollo
