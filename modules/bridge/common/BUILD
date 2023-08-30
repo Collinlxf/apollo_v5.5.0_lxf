@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,6 +13,9 @@ cc_library(
     name = "bridge_gflags",
     srcs = ["bridge_gflags.cc"],
     hdrs = ["bridge_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(
@@ -67,7 +71,7 @@ cc_test(
     srcs = ["bridge_buffer_test.cc"],
     deps = [
         ":bridge_buffer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -77,7 +81,7 @@ cc_test(
     srcs = ["bridge_proto_buf_test.cc"],
     deps = [
         "//modules/bridge:udp_bridge",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

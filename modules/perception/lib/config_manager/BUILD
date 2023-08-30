@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,7 +12,7 @@ cc_library(
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/thread",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
         "@eigen",
     ],
 )
@@ -25,7 +26,7 @@ cc_test(
     ],
     deps = [
         ":config_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

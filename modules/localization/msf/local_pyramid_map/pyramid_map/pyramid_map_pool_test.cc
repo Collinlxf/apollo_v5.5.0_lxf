@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "boost/filesystem.hpp"
+
+#include <boost/filesystem.hpp>
+
 #include "gtest/gtest.h"
 
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
@@ -67,6 +69,7 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   // Release
   pool->Release();
   EXPECT_EQ(pool->GetPoolSize(), 0);
+  pool.reset();
 }
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
@@ -94,6 +97,7 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   // Release
   pool->Release();
   EXPECT_EQ(pool->GetPoolSize(), 0);
+  pool.reset();
 }
 
 }  // namespace pyramid_map

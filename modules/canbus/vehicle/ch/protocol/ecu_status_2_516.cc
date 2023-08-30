@@ -42,10 +42,10 @@ void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
       battery_temperature(bytes, length));
 }
 
-// config detail: {'description': 'Percentage of battery remaining (BMS
-// status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'battery_soc',
-// 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 0, 'type': 'int',
-// 'order': 'intel', 'physical_unit': '%'}
+// config detail: {'bit': 0, 'description': 'Percentage of battery remaining
+// (BMS status)', 'is_signed_var': False, 'len': 8, 'name': 'battery_soc',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|100]',
+// 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
 int Ecustatus2516::battery_soc(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 0);
@@ -55,10 +55,10 @@ int Ecustatus2516::battery_soc(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Battery full capacity (BMS status)',
-// 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'battery_capacity',
-// 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
-// 'order': 'intel', 'physical_unit': 'Ah'}
+// config detail: {'bit': 8, 'description': 'Battery full capacity (BMS
+// status)', 'is_signed_var': False, 'len': 8, 'name': 'battery_capacity',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|100]',
+// 'physical_unit': 'Ah', 'precision': 1.0, 'type': 'int'}
 int Ecustatus2516::battery_capacity(const std::uint8_t* bytes,
                                     int32_t length) const {
   Byte t0(bytes + 1);
@@ -68,10 +68,10 @@ int Ecustatus2516::battery_capacity(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Current battery voltage (BMS status)',
-// 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_voltage',
-// 'is_signed_var': False, 'physical_range': '[0|80]', 'bit': 16, 'type':
-// 'double', 'order': 'intel', 'physical_unit': 'V'}
+// config detail: {'bit': 16, 'description': 'Current battery voltage (BMS
+// status)', 'is_signed_var': False, 'len': 16, 'name': 'battery_voltage',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|80]', 'physical_unit':
+// 'V', 'precision': 0.1, 'type': 'double'}
 double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
                                       int32_t length) const {
   Byte t0(bytes + 3);
@@ -86,10 +86,10 @@ double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Current battery current (BMS status)',
-// 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_current',
-// 'is_signed_var': True, 'physical_range': '[-60|60]', 'bit': 32, 'type':
-// 'double', 'order': 'intel', 'physical_unit': 'A'}
+// config detail: {'bit': 32, 'description': 'Current battery current (BMS
+// status)', 'is_signed_var': True, 'len': 16, 'name': 'battery_current',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[-60|60]',
+// 'physical_unit': 'A', 'precision': 0.1, 'type': 'double'}
 double Ecustatus2516::battery_current(const std::uint8_t* bytes,
                                       int32_t length) const {
   Byte t0(bytes + 5);
@@ -107,10 +107,10 @@ double Ecustatus2516::battery_current(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Current battery temperature (BMS status)',
-// 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'battery_temperature',
-// 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
-// 'int', 'order': 'intel', 'physical_unit': '℃'}
+// config detail: {'bit': 48, 'description': 'Current battery temperature (BMS
+// status)', 'is_signed_var': True, 'len': 16, 'name': 'battery_temperature',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[-40|110]',
+// 'physical_unit': '℃', 'precision': 1.0, 'type': 'int'}
 int Ecustatus2516::battery_temperature(const std::uint8_t* bytes,
                                        int32_t length) const {
   Byte t0(bytes + 7);

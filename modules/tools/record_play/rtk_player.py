@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,27 +22,29 @@ Generate Planning Path
 import argparse
 import atexit
 import logging
+import math
 import os
 import sys
 import time
-import math
 
-from cyber_py import cyber
-from cyber_py import cyber_time
-import scipy.signal as signal
-from common.logger import Logger
 from numpy import genfromtxt
+import scipy.signal as signal
 
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
+from modules.tools.common.logger import Logger
 from modules.canbus.proto import chassis_pb2
-from modules.common.proto import pnc_point_pb2
+from modules.common.configs.proto import vehicle_config_pb2
 from modules.common.proto import drive_state_pb2
+from modules.common.proto import pnc_point_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-from modules.common.configs.proto import vehicle_config_pb2
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 
-APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
+# TODO(all): hard-coded path temporarily. Better approach needed.
+APOLLO_ROOT = "/apollo"
+
 SEARCH_INTERVAL = 5000
 CHANGE_TO_COM = False
 
@@ -60,10 +62,9 @@ class RtkPlayer(object):
         self.logger.info("Load record file from: %s" % record_file)
         try:
             file_handler = open(record_file, 'r')
-        except IOError:
-            self.logger.error("Cannot find file: " + record_file)
-            file_handler.close()
-            sys.exit(0)
+        except (FileNotFoundError, IOError) as ex:
+            self.logger.error("Error opening {}: {}".format(record_file, ex))
+            sys.exit(1)
 
         self.data = genfromtxt(file_handler, delimiter=',', names=True)
         file_handler.close()
@@ -116,8 +117,8 @@ class RtkPlayer(object):
         New chassis Received
         """
         self.chassis.CopyFrom(data)
-        self.automode = (self.chassis.driving_mode ==
-                         chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
+        self.automode = (self.chassis.driving_mode
+                         == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
         self.chassis_received = True
 
     def padmsg_callback(self, data):
@@ -148,8 +149,8 @@ class RtkPlayer(object):
     def closest_dist(self):
         shortest_dist_sqr = float('inf')
         self.logger.info("before closest self.start=%s" % (self.start))
-        search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
-        search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
+        search_start = max(self.start - SEARCH_INTERVAL // 2, 0)
+        search_end = min(self.start + SEARCH_INTERVAL // 2, len(self.data))
         self.logger.debug("search_start: %s" % search_start)
         self.logger.debug("search_end: %s" % search_end)
         closest_dist_point = self.start
@@ -186,12 +187,14 @@ class RtkPlayer(object):
         for i in range(start, end):
             # trajectory with gear switch
             # include gear_neutral at the beginning of a trajectory
-            if (i < end - 1 and
-                self.data['gear'][i] in {1, 2} and
-                self.data['gear'][i + 1] != self.data['gear'][i]):
+            if (i < end - 1
+                and self.data['gear'][i] in {1, 2}
+                    and self.data['gear'][i + 1] != self.data['gear'][i]):
                 self.logger.debug("enter i in while loop: [ %s ]" % i)
-                self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
-                self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])
+                self.logger.debug(
+                    "self.data['gear'][i] != 1: %s" % self.data['gear'][i])
+                self.logger.debug(
+                    "self.data['gear'][i] != 2: %s" % self.data['gear'][i])
                 # find next gear = 1 or 2
                 i += 1
                 while i < end and (self.data['gear'][i] != 1) and (self.data['gear'][i] != 2):
@@ -263,13 +266,13 @@ class RtkPlayer(object):
 
         planningdata.total_path_length = self.data['s'][self.end] - \
             self.data['s'][self.start]
-        self.logger.info("total number of planning data point: %d" % (self.end - self.start))
+        self.logger.info("total number of planning data point: %d" %
+                         (self.end - self.start))
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
         planningdata.gear = int(self.data['gear'][self.closest_time()])
         planningdata.engage_advice.advice = \
             drive_state_pb2.EngageAdvice.READY_TO_ENGAGE
-        planningdata.trajectory_type = planning_pb2.ADCTrajectory.NORMAL
 
         for i in range(self.start, self.end):
             adc_point = pnc_point_pb2.TrajectoryPoint()
@@ -286,10 +289,10 @@ class RtkPlayer(object):
             if CHANGE_TO_COM:
                 # translation vector length(length / 2 - back edge to center)
                 adc_point.path_point.x = adc_point.path_point.x + \
-                    (self.vehicle_param.length / 2 - self.vehicle_param.back_edge_to_center) * \
+                    (self.vehicle_param.length // 2 - self.vehicle_param.back_edge_to_center) * \
                     math.cos(adc_point.path_point.theta)
                 adc_point.path_point.y = adc_point.path_point.y + \
-                    (self.vehicle_param.length / 2 - self.vehicle_param.back_edge_to_center) * \
+                    (self.vehicle_param.length // 2 - self.vehicle_param.back_edge_to_center) * \
                     math.sin(adc_point.path_point.theta)
 
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
@@ -307,8 +310,8 @@ class RtkPlayer(object):
         planningdata.estop.is_estop = self.estop
 
         self.planning_pub.write(planningdata)
-        self.logger.debug("Generated Planning Sequence: " +
-                          str(self.sequence_num - 1))
+        self.logger.debug("Generated Planning Sequence: "
+                          + str(self.sequence_num - 1))
 
     def shutdown(self):
         """

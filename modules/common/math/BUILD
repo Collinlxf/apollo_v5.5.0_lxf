@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,10 +16,32 @@ cc_library(
         ":kalman_filter",
         ":linear_interpolation",
         ":lqr",
-        ":mpc",
+        ":mpc_osqp",
         ":quaternion",
         ":search",
         ":sin_table",
+    ],
+)
+
+cc_library(
+    name = "math_utils",
+    srcs = ["math_utils.cc"],
+    hdrs = ["math_utils.h"],
+    linkopts = ["-lm"],
+    deps = [
+        ":vec2d",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "vec2d",
+    srcs = ["vec2d.cc"],
+    hdrs = ["vec2d.h"],
+    linkopts = ["-lm"],
+    deps = [
+        "//cyber/common:log",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -28,10 +51,7 @@ cc_library(
         "aabox2d.cc",
         "box2d.cc",
         "line_segment2d.cc",
-        "math_utils.cc",
-        "math_utils.h",
         "polygon2d.cc",
-        "vec2d.cc",
     ],
     hdrs = [
         "aabox2d.h",
@@ -39,13 +59,13 @@ cc_library(
         "box2d.h",
         "line_segment2d.h",
         "polygon2d.h",
-        "vec2d.h",
     ],
+    linkopts = ["-lm"],
     deps = [
+        ":math_utils",
         "//cyber/common:log",
         "//modules/common/util:string_util",
         "@com_google_absl//absl/strings",
-        "@eigen",
         "@osqp",
     ],
 )
@@ -80,7 +100,7 @@ cc_library(
     deps = [
         ":euler_angles_zxy",
         ":geometry",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "@eigen",
     ],
 )
@@ -108,9 +128,10 @@ cc_test(
     name = "matrix_operations_test",
     size = "small",
     srcs = ["matrix_operations_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":matrix_operations",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -135,7 +156,7 @@ cc_library(
     hdrs = ["path_matcher.h"],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -154,9 +175,12 @@ cc_test(
     name = "angle_test",
     size = "small",
     srcs = ["angle_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":angle",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -172,7 +196,7 @@ cc_library(
     hdrs = ["linear_interpolation.h"],
     deps = [
         ":geometry",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -191,18 +215,6 @@ cc_library(
     hdrs = ["linear_quadratic_regulator.h"],
     deps = [
         "//cyber/common:log",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "mpc",
-    srcs = ["mpc_solver.cc"],
-    hdrs = ["mpc_solver.h"],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
     ],
 )
@@ -231,23 +243,9 @@ cc_test(
     size = "small",
     srcs = ["mpc_osqp_test.cc"],
     deps = [
-        ":mpc",
         ":mpc_osqp",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "mpc_test",
-    size = "small",
-    srcs = ["mpc_solver_test.cc"],
-    deps = [
-        ":mpc",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
+        "//cyber/common:log",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -257,7 +255,7 @@ cc_test(
     srcs = ["math_utils_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -268,8 +266,8 @@ cc_test(
     deps = [
         ":linear_interpolation",
         "//cyber/common:log",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
@@ -277,9 +275,12 @@ cc_test(
     name = "search_test",
     size = "small",
     srcs = ["search_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":search",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -287,9 +288,12 @@ cc_test(
     name = "integral_test",
     size = "small",
     srcs = ["integral_test.cc"],
+    linkopts = [
+        "-lm",
+    ],
     deps = [
         ":integral",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -299,7 +303,7 @@ cc_test(
     srcs = ["vec2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -309,7 +313,7 @@ cc_test(
     srcs = ["quaternion_test.cc"],
     deps = [
         ":quaternion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -319,7 +323,7 @@ cc_test(
     srcs = ["euler_angles_zxy_test.cc"],
     deps = [
         ":euler_angles_zxy",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -329,7 +333,7 @@ cc_test(
     srcs = ["aabox2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -339,7 +343,7 @@ cc_test(
     srcs = ["aaboxkdtree2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -349,7 +353,7 @@ cc_test(
     srcs = ["box2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -359,7 +363,7 @@ cc_test(
     srcs = ["polygon2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -369,7 +373,7 @@ cc_test(
     srcs = ["line_segment2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -377,9 +381,10 @@ cc_test(
     name = "kalman_filter_test",
     size = "small",
     srcs = ["kalman_filter_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -389,7 +394,7 @@ cc_test(
     srcs = ["cartesian_frenet_conversion_test.cc"],
     deps = [
         ":cartesian_frenet_conversion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

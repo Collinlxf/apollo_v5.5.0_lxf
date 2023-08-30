@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ class Pas1stdata311Test : public ::testing::Test {
 
 TEST_F(Pas1stdata311Test, reset) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t length = 8;
+  ChassisDetail cd;
   Pas1stdata311 accel_cmd;
-  EXPECT_EQ(accel_cmd.GetPeriod(), 100 * 1000);
-  accel_cmd.UpdateData(data);
+  accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);
   EXPECT_EQ(data[1], 0b01100010);
   EXPECT_EQ(data[2], 0b01100011);
@@ -43,6 +44,15 @@ TEST_F(Pas1stdata311Test, reset) {
   EXPECT_EQ(data[5], 0b01010010);
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
+
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pasdistance4(), 162);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pasdistance3(), 200);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pas_f1_status(), true);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pas_f2_status(), true);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pas_f3_status(), true);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pas_f4_status(), false);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pasdistance2(), 198);
+  EXPECT_EQ(cd.neolix_edu().pas_1st_data_311().pasdistance1(), 196);
 }
 
 }  // namespace neolix_edu

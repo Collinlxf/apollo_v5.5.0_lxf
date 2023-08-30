@@ -38,7 +38,7 @@
 #include <string>
 
 #ifndef __aarch64__
-#include "adv_plat/include/adv_trigger.h"
+#include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
 #endif
 #include "modules/drivers/camera/usb_cam.h"
@@ -93,7 +93,7 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
 
   // Warning when diff with last > 1.5* interval
   frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
-  // now max fps 30, we use a appox time 0.9 to drop image.
+  // now max fps 30, we use an appox time 0.9 to drop image.
   frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
 
   return true;
@@ -938,10 +938,9 @@ bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
       unsigned char yuyvbuf[len];
       unsigned char uyvybuf[len];
       memcpy(yuyvbuf, src, len);
-      for (int index = 0; index < len; index = index + 2)
-      {
-        uyvybuf[index] = yuyvbuf[index+1];
-        uyvybuf[index+1] = yuyvbuf[index];
+      for (int index = 0; index < len; index = index + 2) {
+        uyvybuf[index] = yuyvbuf[index + 1];
+        uyvybuf[index + 1] = yuyvbuf[index];
       }
       memcpy(src, uyvybuf, len);
     }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ class Aebsystemstate11Test : public ::testing::Test {
 
 TEST_F(Aebsystemstate11Test, reset) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t length = 8;
+  ChassisDetail cd;
   Aebsystemstate11 accel_cmd;
-  EXPECT_EQ(accel_cmd.GetPeriod(), 100 * 1000);
-  accel_cmd.UpdateData(data);
+  accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);
   EXPECT_EQ(data[1], 0b01100010);
   EXPECT_EQ(data[2], 0b01100011);
@@ -43,6 +44,19 @@ TEST_F(Aebsystemstate11Test, reset) {
   EXPECT_EQ(data[5], 0b01010010);
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
+
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().aeb_state(), 3);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().aeb_brakestate(), true);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().faultrank(), 2);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().currenttemperature(), 59);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_f1_stop(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_f2_stop(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_f3_stop(), true);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_f4_stop(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_b1_stop(), false);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_b2_stop(), true);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_b3_stop(), true);
+  EXPECT_EQ(cd.neolix_edu().aeb_systemstate_11().pas_b4_stop(), false);
 }
 
 }  // namespace neolix_edu

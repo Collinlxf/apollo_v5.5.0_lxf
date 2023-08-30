@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -37,7 +38,7 @@ cc_library(
         "vin_resp3_393.h",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -49,7 +50,7 @@ cc_test(
     srcs = ["ads1_111_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -59,7 +60,7 @@ cc_test(
     srcs = ["ads3_38e_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -69,7 +70,7 @@ cc_test(
     srcs = ["ads_eps_113_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -79,7 +80,7 @@ cc_test(
     srcs = ["ads_req_vin_390_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -89,7 +90,7 @@ cc_test(
     srcs = ["ads_shifter_115_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -99,7 +100,7 @@ cc_test(
     srcs = ["fail_241_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -109,7 +110,7 @@ cc_test(
     srcs = ["fbs1_243_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -119,7 +120,7 @@ cc_test(
     srcs = ["fbs2_240_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -129,7 +130,7 @@ cc_test(
     srcs = ["fbs3_237_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -139,7 +140,7 @@ cc_test(
     srcs = ["fbs4_235_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -149,7 +150,7 @@ cc_test(
     srcs = ["status_310_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -159,7 +160,7 @@ cc_test(
     srcs = ["vin_resp1_391_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -169,7 +170,7 @@ cc_test(
     srcs = ["vin_resp2_392_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -179,7 +180,7 @@ cc_test(
     srcs = ["vin_resp3_393_test.cc"],
     deps = [
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

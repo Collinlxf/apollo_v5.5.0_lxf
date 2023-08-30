@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_component.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/object_pool_types.h"
-#include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
 
@@ -42,7 +42,7 @@ bool FusionComponent::Init() {
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
   // init algorithm plugin
-  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
+  ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   writer_ = node_->CreateWriter<PerceptionObstacles>(
       comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
@@ -83,11 +83,11 @@ bool FusionComponent::InitAlgorithmPlugin() {
   fusion::ObstacleMultiSensorFusionParam param;
   param.main_sensor = fusion_main_sensor_;
   param.fusion_method = fusion_method_;
-  CHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
+  ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = map::HDMapInput::Instance();
-    CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
+    ACHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   AINFO << "Init algorithm successfully, onboard fusion: " << fusion_method_;
   return true;
@@ -102,7 +102,7 @@ bool FusionComponent::InternalProc(
     s_seq_num_++;
   }
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   const double timestamp = in_message->timestamp_;
   const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
@@ -128,8 +128,7 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_process"),
-                                           in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_process", in_message->sensor_id_);
 
   if (in_message->sensor_id_ != fusion_main_sensor_) {
     return true;
@@ -156,8 +155,7 @@ bool FusionComponent::InternalProc(
   } else {
     valid_objects.assign(fused_objects.begin(), fused_objects.end());
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_roi_check"),
-                                           in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_roi_check", in_message->sensor_id_);
 
   // produce visualization msg
   if (FLAGS_obs_enable_visualization) {
@@ -180,13 +178,13 @@ bool FusionComponent::InternalProc(
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      std::string("fusion_serialize_message"), in_message->sensor_id_);
+  PERF_BLOCK_END_WITH_INDICATOR("fusion_serialize_message",
+                                in_message->sensor_id_);
 
-  const double cur_time = apollo::common::time::Clock::NowInSeconds();
+  const double cur_time = ::apollo::cyber::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time[" << timestamp
-        << "]:cur_time[" << cur_time << "]:cur_latency[" << latency
+  AINFO << std::setprecision(16) << "FRAME_STATISTICS:Obstacle:End:msg_time["
+        << timestamp << "]:cur_time[" << cur_time << "]:cur_latency[" << latency
         << "]:obj_cnt[" << valid_objects.size() << "]";
   AINFO << "publish_number: " << valid_objects.size() << " obj";
   return true;

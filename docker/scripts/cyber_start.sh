@@ -20,27 +20,28 @@ source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
 
 # CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-VERSION_X86_64="cyber-x86_64-18.04-20191003_1544"
-VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
-
-VERSION_LOCAL_CYBER="local_cyber_dev"
+VERSION_X86_64="cyber-x86_64-18.04-20200914_0704"
+# ARMV8
+# VERSION_AARCH64="cyber-aarch64-18.04-20200717_0327"
+# L4T
+VERSION_AARCH64="cyber-aarch64-18.04-20200915_0055"
 CYBER_CONTAINER="apollo_cyber_${USER}"
-CYBER_INSIDE="in_cyber_docker"
+CYBER_INSIDE="in-cyber-docker"
 
 DOCKER_REPO="apolloauto/apollo"
 DOCKER_RUN_CMD="docker run"
 DOCKER_PULL_CMD="docker pull"
+SHM_SIZE="2G"
 
 SUPPORTED_ARCHS=" x86_64 aarch64 "
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH=""
 
-USE_GPU=0
+USE_GPU_HOST=0
 USE_LOCAL_IMAGE=0
 CUSTOM_VERSION=
 GEOLOC=
-
-ARCH=$(uname -m)
+GEO_REGISTRY=
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -102,6 +103,7 @@ OPTIONS:
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
     -m <arch>              Specify docker image for a different CPU arch.
+    --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
     stop [-f|--force]      Stop all running Apollo containers. Use "-f" to force removal.
 EOF
 }
@@ -137,6 +139,7 @@ function parse_arguments() {
     local use_local_image=0
     local custom_version=""
     local target_arch=""
+    local shm_size=""
     local geo=""
 
     while [[ $# -gt 0 ]] ; do
@@ -165,6 +168,10 @@ function parse_arguments() {
             _optarg_check_for_opt "${opt}" "${target_arch}"
             _target_arch_check "${target_arch}"
             ;;
+        --shm-size)
+            shm_size="$1"; shift
+            _optarg_check_for_opt "${opt}" "${shm_size}"
+            ;;
         stop)
             local force="$1"; shift
             info "Now, stop all apollo containers created by ${USER} ..."
@@ -180,11 +187,12 @@ function parse_arguments() {
 
     [[ ! -z "${geo}" ]] && GEOLOC="${geo}"
     USE_LOCAL_IMAGE="${use_local_image}"
-    [[ ! -z "${target_arch}" ]] && TARGET_ARCH="${target_arch}"
-    [[ ! -z "${custom_version}" ]] && CUSTOM_VERSION="${custom_version}"
+    [[ -n "${target_arch}" ]] && TARGET_ARCH="${target_arch}"
+    [[ -n "${custom_version}" ]] && CUSTOM_VERSION="${custom_version}"
+    [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
-# TODO(storypku): What does these do with apollo inside container
+# lxfTODO(storypku): What does these do with apollo inside container
 # if [ ! -e /apollo ]; then
 #    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
 # fi
@@ -212,26 +220,18 @@ function determine_target_version_and_arch() {
     local version="$1"
     # If no custom version specified
     if [[ -z "${version}" ]]; then
-        if [[ ${USE_LOCAL_IMAGE} -eq 1 ]]; then
-            version="${VERSION_LOCAL_CYBER}"
-            if [[ -z "${TARGET_ARCH}" ]]; then
-                TARGET_ARCH="${HOST_ARCH}"
-            fi
-            _target_arch_check "${TARGET_ARCH}"
-        else # Neither CUSTOM_VERSION nor USE_LOCAL_IMAGE set
-            # if target arch not set, assume it is equal to host arch.
-            if [[ -z "${TARGET_ARCH}" ]]; then
-                TARGET_ARCH="${HOST_ARCH}"
-            fi
-            _target_arch_check "${TARGET_ARCH}"
-            if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-                version="${VERSION_X86_64}"
-            elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-                version="${VERSION_AARCH64}"
-            else
-                error "CAN'T REACH HERE"
-                exit 1
-            fi
+        # if target arch not set, assume it is equal to host arch.
+        if [[ -z "${TARGET_ARCH}" ]]; then
+            TARGET_ARCH="${HOST_ARCH}"
+        fi
+        _target_arch_check "${TARGET_ARCH}"
+        if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            version="${VERSION_X86_64}"
+        elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+            version="${VERSION_AARCH64}"
+        else
+            error "CAN'T REACH HERE"
+            exit 1
         fi
     elif [[ "${version}" =~ local* ]]; then
         if [[ -z "${TARGET_ARCH}" ]]; then
@@ -260,7 +260,6 @@ function determine_target_version_and_arch() {
     CUSTOM_VERSION="${version}"
 }
 
-# Operate on DOCKER_REPO
 function geo_specific_config() {
     local geo="$1"
     if [[ -z "${geo}" ]]; then
@@ -268,11 +267,29 @@ function geo_specific_config() {
     fi
     info "Setup geolocation specific configurations for ${geo}"
     if [[ "${geo}" == "cn" ]]; then
-        info "TODO: CN mirrors"
+        GEO_REGISTRY="registry.baidubce.com"
     fi
 }
 
-function determine_gpu_use() {
+function determine_gpu_use_aarch64() {
+    local use_gpu=0
+    if  lsmod | grep -q nvgpu ; then
+        use_gpu=1
+    fi
+    if [[ "${use_gpu}" -eq 1 ]]; then
+        local docker_version
+        docker_version="$(docker version --format '{{.Server.Version}}')"
+        if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
+            DOCKER_RUN_CMD="docker run --gpus all"
+        else
+            warning "You must upgrade to Docker-CE 19.03+ to access GPU from container!"
+            use_gpu=0
+        fi
+    fi
+    USE_GPU_HOST="${use_gpu}"
+}
+
+function determine_gpu_use_amd64() {
     # Check nvidia-driver and GPU device
     local nv_driver="nvidia-smi"
     if [ ! -x "$(command -v ${nv_driver} )" ]; then
@@ -280,35 +297,40 @@ function determine_gpu_use() {
     elif [ -z "$(eval ${nv_driver} )" ]; then
         warning "No GPU device found. CPU will be used."
     else
-        USE_GPU=1
+        USE_GPU_HOST=1
     fi
 
     # Try to use GPU inside container
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [ ${USE_GPU} -eq 1 ]; then
-        if [ ! -z "$(which nvidia-docker)" ]; then
-            DOCKER_RUN_CMD="nvidia-docker run"
-            warning "nvidia-docker is deprecated. Please install latest docker" \
-                    "and nvidia-container-toolkit as described by:"
-            warning "  ${nv_docker_doc}"
-        elif [ ! -z "$(which nvidia-container-toolkit)" ]; then
+    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
+        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
             if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
                 DOCKER_RUN_CMD="docker run --gpus all"
             else
                 warning "You must upgrade to docker-ce 19.03+ to access GPU from container!"
-                USE_GPU=0
+                USE_GPU_HOST=0
             fi
+        elif [[ -x "$(which nvidia-docker)" ]]; then
+            DOCKER_RUN_CMD="nvidia-docker run"
         else
-            USE_GPU=0
-            warning "Cannot access GPU from within container. Please install latest docker" \
-                    "and nvidia-container-toolkit as described by: "
+            USE_GPU_HOST=0
+            warning "Cannot access GPU from within container. Please install latest Docker" \
+                    "and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
     fi
 }
 
+function determine_gpu_use_host() {
+    if [[ "${HOST_ARCH}" == "x86_64" ]]; then
+        determine_gpu_use_amd64
+    else
+        determine_gpu_use_aarch64
+    fi
+
+}
 function setup_devices_and_mount_volumes() {
     local __retval="$1"
 
@@ -328,12 +350,15 @@ function setup_devices_and_mount_volumes() {
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
-        14.04)
-            warning "[Deprecated] Support for Ubuntu 14.04 will be removed" \
+        16.04)
+            # Mount host devices into container (/dev)
+            warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
                     "in the near future. Please upgrade to ubuntu 18.04+."
+            if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                volumes="${volumes} -v /dev:/dev"
+            fi
             ;;
-        16.04|18.04|20.04|*)
-            ## Question(storypku): Any special considerations here ?
+        18.04|20.04|*)
             if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
                 volumes="${volumes} -v /dev:/dev"
             fi
@@ -352,17 +377,6 @@ function setup_devices_and_mount_volumes() {
     fi
     volumes="$(tr -s " " <<< "${volumes}")"
     eval "${__retval}='${volumes}'"
-}
-
-function determine_display() {
-    local display
-    # read from env
-    if [[ -z "${DISPLAY}" ]]; then
-        display=":0"
-    else
-        display="${DISPLAY}"
-    fi
-    echo "${display}"
 }
 
 function remove_existing_cyber_container() {
@@ -387,9 +401,11 @@ function docker_pull_if_needed() {
         return
     fi
 
-    # Note(storypku): use may-be-modified ${DOCKER_REPO}
     image="${DOCKER_REPO}:${image##*:}"
     echo "Start pulling docker image: ${image}"
+    if [[ -n "${GEO_REGISTRY}" ]]; then
+        image="${GEO_REGISTRY}/${image}"
+    fi
     if ! ${DOCKER_PULL_CMD} "${image}"; then
         error "Failed to pull docker image: ${image}"
         exit 1
@@ -440,7 +456,7 @@ function start_cyber_container() {
     local local_volumes
     setup_devices_and_mount_volumes local_volumes
 
-    local display="$(determine_display)"
+    local display="${DISPLAY:-:0}"
 
     set -x
     ${DOCKER_RUN_CMD} -it \
@@ -454,7 +470,7 @@ function start_cyber_container() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${image}" \
-        -e USE_GPU="${USE_GPU}" \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         -e OMP_NUM_THREADS=1 \
@@ -464,7 +480,7 @@ function start_cyber_container() {
         --add-host "${CYBER_INSIDE}:172.0.0.1" \
         --add-host "${local_host}:127.0.0.1" \
         --hostname "${CYBER_INSIDE}" \
-        --shm-size 2G \
+        --shm-size "${SHM_SIZE}" \
         --pid=host \
         "${image}" \
         /bin/bash
@@ -481,11 +497,11 @@ function after_run_setup() {
         docker exec -u root "${CYBER_CONTAINER}" \
             bash -c '/apollo/scripts/docker_start_user.sh'
     fi
-    if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-        warning "!!! Due to problem with 'docker exec' on Drive PX2 platform," \
-                "please run '/apollo/scripts/docker_start_user.sh' the first" \
-                "time you login into cyber docker !!!"
-    fi
+    # if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+    #    warning "!!! Due to problem with 'docker exec' on Drive PX2 platform," \
+    #            "please run '/apollo/scripts/docker_start_user.sh' the first" \
+    #            "time you login into cyber docker !!!"
+    # fi
 }
 
 function main() {
@@ -502,11 +518,9 @@ function main() {
     geo_specific_config "${GEOLOC}"
     docker_pull_if_needed "${image}" "${USE_LOCAL_IMAGE}"
 
-    image="${DOCKER_REPO}:${CUSTOM_VERSION}"
-
     remove_existing_cyber_container
 
-    determine_gpu_use
+    determine_gpu_use_host
     info "DOCKER_RUN_CMD evaluated to: ${DOCKER_RUN_CMD}"
 
     start_cyber_container "${image}"

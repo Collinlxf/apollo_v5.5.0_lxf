@@ -15,9 +15,12 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
+
 #include <omp.h>
 #include <algorithm>
+#include <limits>
 #include <map>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -32,7 +35,7 @@ using Eigen::MatrixXf;
 
 bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
   std::string param_file;
-  CHECK(GetConfigs(&param_file));
+  ACHECK(GetConfigs(&param_file));
   AINFO << "--    param_file: " << param_file;
 
   if (!Configure(param_file)) {
@@ -41,19 +44,17 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
   }
 
   // init ground detector
-  ground_detector_.reset(
-      BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_));
-  CHECK_NOTNULL(ground_detector_.get());
+  ground_detector_ = BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_);
+  CHECK_NOTNULL(ground_detector_);
   GroundDetectorInitOptions ground_detector_init_options;
-  CHECK(ground_detector_->Init(ground_detector_init_options))
+  ACHECK(ground_detector_->Init(ground_detector_init_options))
       << "Failed to init ground detection.";
 
   // init roi filter
-  roi_filter_.reset(
-      BaseROIFilterRegisterer::GetInstanceByName(roi_filter_str_));
-  CHECK_NOTNULL(roi_filter_.get());
+  roi_filter_ = BaseROIFilterRegisterer::GetInstanceByName(roi_filter_str_);
+  CHECK_NOTNULL(roi_filter_);
   ROIFilterInitOptions roi_filter_init_options;
-  CHECK(roi_filter_->Init(roi_filter_init_options))
+  ACHECK(roi_filter_->Init(roi_filter_init_options))
       << "Failed to init roi filter.";
 
   _outliers.reset(new std::vector<ObjectPtr>);
@@ -126,7 +127,7 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
 bool NCutSegmentation::Configure(std::string param_file) {
   NCutSegmentationParam seg_param_;
   // get cnnseg params
-  CHECK(GetProtoFromFile(param_file, &seg_param_))
+  ACHECK(GetProtoFromFile(param_file, &seg_param_))
       << "Failed to parse CNNSegParam config file." << param_file;
   grid_radius_ = seg_param_.grid_radius();
   height_threshold_ = seg_param_.height_threshold();
@@ -150,19 +151,19 @@ bool NCutSegmentation::Configure(std::string param_file) {
 bool NCutSegmentation::GetConfigs(std::string* param_file) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig("NCutSegmentation", &model_config))
+  ACHECK(config_manager->GetModelConfig("NCutSegmentation", &model_config))
       << "Failed to get model config: CNNSegmentation";
 
   const std::string& work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ncut.conf");
 
   NCutConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
   *param_file = GetAbsolutePath(work_root, config.param_file());
   return true;
@@ -295,7 +296,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   // .5.1 outlier
   for (size_t i = 0; i < cloud_outlier.size(); ++i) {
     base::PointFCloudPtr pc = cloud_components[cloud_outlier[i]];
-    base::ObjectPtr obj = std::make_shared<base::Object>();
+    base::ObjectPtr obj(new base::Object);
     obj->lidar_supplement.cloud = *pc;
     _outliers->push_back(obj);
   }
@@ -494,12 +495,12 @@ bool NCutSegmentation::IsOutlier(const base::PointFCloudPtr& in_cloud) {
   if (in_cloud->size() < min_num_points) {
     return true;
   }
-  float x_max = -FLT_MAX;
-  float y_max = -FLT_MAX;
-  float z_max = -FLT_MAX;
-  float x_min = FLT_MAX;
-  float y_min = FLT_MAX;
-  float z_min = FLT_MAX;
+  float x_max = -std::numeric_limits<float>::max();
+  float y_max = -std::numeric_limits<float>::max();
+  float z_max = -std::numeric_limits<float>::max();
+  float x_min = std::numeric_limits<float>::max();
+  float y_min = std::numeric_limits<float>::max();
+  float z_min = std::numeric_limits<float>::max();
   base::PointF pt_max = (*in_cloud)[0];
   for (size_t i = 0; i < in_cloud->size(); ++i) {
     const base::PointF& pt = (*in_cloud)[i];

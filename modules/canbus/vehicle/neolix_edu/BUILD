@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -26,10 +27,10 @@ cc_library(
         "neolix_edu_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/neolix_edu/protocol:canbus_neolix_edu_protocol",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -43,12 +44,12 @@ cc_library(
     ],
     deps = [
         ":neolix_edu_message_manager",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/neolix_edu/protocol:canbus_neolix_edu_protocol",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -59,7 +60,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":neolix_edu_controller",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -69,7 +70,7 @@ cc_test(
     srcs = ["neolix_edu_message_manager_test.cc"],
     deps = [
         "//modules/canbus/vehicle/neolix_edu:neolix_edu_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -79,7 +80,7 @@ cc_test(
     srcs = ["neolix_edu_vehicle_factory_test.cc"],
     deps = [
         ":neolix_edu_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

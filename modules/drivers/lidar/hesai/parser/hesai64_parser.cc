@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/hesai/parser/parser.h"
+#include "modules/drivers/lidar/hesai/parser/hesai64_parser.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
+
+using Node = ::apollo::cyber::Node;
+using apollo::drivers::PointXYZIT;
 
 Hesai64Parser::Hesai64Parser(const std::shared_ptr<Node> &node,
                              const Config &conf)
@@ -260,4 +263,3 @@ void Hesai64Parser::CalcPointXYZIT(Hesai64Packet *pkt, int blockid,
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-

@@ -18,9 +18,10 @@
  * @file
  */
 
+#include <cmath>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"

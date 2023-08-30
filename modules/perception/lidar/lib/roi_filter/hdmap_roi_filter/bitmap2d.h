@@ -18,8 +18,8 @@
 
 #include <vector>
 
+#include <boost/format.hpp>
 #include "Eigen/Core"
-#include "boost/format.hpp"
 
 namespace apollo {
 namespace perception {

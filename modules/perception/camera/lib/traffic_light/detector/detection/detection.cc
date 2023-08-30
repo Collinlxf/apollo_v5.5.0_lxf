@@ -90,8 +90,8 @@ bool TrafficLightDetection::Init(
   AINFO << "model_type: " << model_type;
 
   rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
-                                                 weight_file, net_outputs_,
-                                                 net_inputs_, model_root));
+                                                weight_file, net_outputs_,
+                                                net_inputs_, model_root));
 
   AINFO << "rt_net_ create succeed";
   rt_net_->set_gpu_id(options.gpu_id);
@@ -101,7 +101,7 @@ bool TrafficLightDetection::Init(
   int resize_height = detection_param_.min_crop_size();
   int resize_width = detection_param_.min_crop_size();
   max_batch_size_ = detection_param_.max_batch_size();
-  param_blob_length_ = 6;
+  param_blob_length_ = 3;
 
   CHECK_GT(resize_height, 0);
   CHECK_GT(resize_width, 0);
@@ -118,7 +118,7 @@ bool TrafficLightDetection::Init(
       (std::pair<std::string, std::vector<int>>(net_inputs_[1], shape_param)));
 
   if (!rt_net_->Init(input_reshape)) {
-    AINFO << "net init fail.";
+    AWARN << "net init fail.";
     return false;
   }
   AINFO << "net init success.";
@@ -132,9 +132,6 @@ bool TrafficLightDetection::Init(
     param_data[offset + 0] = static_cast<float>(resize_width);
     param_data[offset + 1] = static_cast<float>(resize_height);
     param_data[offset + 2] = 1;
-    param_data[offset + 3] = 1;
-    param_data[offset + 4] = 0;
-    param_data[offset + 5] = 0;
   }
 
   switch (detection_param_.crop_method()) {
@@ -173,7 +170,7 @@ bool TrafficLightDetection::Inference(
                           static_cast<int>(detection_param_.min_crop_size()),
                           static_cast<int>(detection_param_.min_crop_size()),
                           3);
-  param_blob_->Reshape(static_cast<int>(batch_num), 6, 1, 1);
+  param_blob_->Reshape(static_cast<int>(batch_num), 1, 3, 1);
   float *param_data = param_blob_->mutable_cpu_data();
   for (size_t i = 0; i < batch_num; ++i) {
     auto offset = i * param_blob_length_;
@@ -182,9 +179,6 @@ bool TrafficLightDetection::Inference(
     param_data[offset + 1] =
         static_cast<float>(detection_param_.min_crop_size());
     param_data[offset + 2] = 1;
-    param_data[offset + 3] = 1;
-    param_data[offset + 4] = 0;
-    param_data[offset + 5] = 0;
   }
 
   AINFO << "reshape inputblob " << input_img_blob->shape_string();
@@ -213,7 +207,7 @@ bool TrafficLightDetection::Inference(
       resize_scale_list_.push_back(resize_scale);
 
       inference::ResizeGPU(*image_, input_img_blob, img_width, resize_index,
-                           mean_[0], mean_[1], mean_[2], true, 1.0);
+                            mean_[0], mean_[1], mean_[2], true, 1.0);
       resize_index++;
     }
   }
@@ -353,7 +347,7 @@ bool TrafficLightDetection::SelectOutputBoxes(
       }
 
       RefineBox(tmp->region.detection_roi, crop_box_list.at(img_id).width,
-                crop_box_list.at(img_id).height, &(tmp->region.detection_roi));
+          crop_box_list.at(img_id).height, &(tmp->region.detection_roi));
       tmp->region.detection_roi.x += crop_box_list.at(img_id).x;
       tmp->region.detection_roi.y += crop_box_list.at(img_id).y;
       tmp->region.is_detected = true;
@@ -364,7 +358,7 @@ bool TrafficLightDetection::SelectOutputBoxes(
 
       lights->push_back(tmp);
     } else {
-      AINFO << "Invalid classid  "
+      AWARN << "Invalid classid  "
             << static_cast<int>(tmp->region.detect_class_id);
     }
   }

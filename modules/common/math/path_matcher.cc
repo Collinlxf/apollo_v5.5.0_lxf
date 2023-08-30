@@ -31,6 +31,10 @@ namespace apollo {
 namespace common {
 namespace math {
 
+/*
+TODO CHECK_GT学习
+TODO .front用法学习
+*/
 PathPoint PathMatcher::MatchToPath(const std::vector<PathPoint>& reference_line,
                                    const double x, const double y) {
   CHECK_GT(reference_line.size(), 0);

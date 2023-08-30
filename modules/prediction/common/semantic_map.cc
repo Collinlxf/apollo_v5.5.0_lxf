@@ -37,8 +37,7 @@ namespace prediction {
 namespace {
 
 bool ValidFeatureHistory(const ObstacleHistory& obstacle_history,
-                         const double curr_base_x,
-                         const double curr_base_y) {
+                         const double curr_base_x, const double curr_base_y) {
   if (obstacle_history.feature_size() == 0) {
     return false;
   }
@@ -334,6 +333,10 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
     if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, base_x, base_y, img);
     } else {
+      if (feature.polygon_point_size() == 0) {
+        AERROR << "No polygon points in feature, please check!";
+        continue;
+      }
       DrawPoly(feature, decay_color, base_x, base_y, img);
     }
   }

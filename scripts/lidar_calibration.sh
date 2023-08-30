@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -27,25 +27,25 @@ fi
 cd "${APOLLO_ROOT_DIR}/data/bag"
 
 function check_bag() {
-  INFO=`rosbag info lidar_calib.bag`
+  INFO=$(rosbag info lidar_calib.bag)
 
   RESULT=0
   # check InsStat topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/sensor/gnss/ins_stat")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No InsStat topic. "
     RESULT=1
   fi
 
   # check VelodyneScan topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/sensor/velodyne64/VelodyneScanUnified")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No VelodyneScan topic. "
     RESULT=1
   fi
 
   # check Relative Odometry topic
-  FLAG=`echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}'`
+  FLAG=$(echo ${INFO} | awk '{print match($0, "/apollo/calibration/relative_odometry")}')
   if [ ${FLAG} -eq 0 ]; then
     echo "No Relative Odometry topic. "
     RESULT=1
@@ -59,7 +59,7 @@ function pack() {
 
   md5sum lidar_calib.bag > bag_md5
   tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 \
-    </dev/null >"${LOG}" 2>&1
+    < /dev/null > "${LOG}" 2>&1
 
   if [ -f bag_md5 ]; then
     rm bag_md5
@@ -75,7 +75,7 @@ function start_record() {
   MODULE="republish_msg"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
+  NUM_PROCESSES="$(pgrep -f "modules/calibration/${MODULE}" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     eval "nohup ${APOLLO_BIN_PREFIX}/modules/calibration/${MODULE}/${MODULE} \
       --flagfile=${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/conf/${MODULE}.conf \
@@ -89,14 +89,14 @@ function start_record() {
   fi
 
   # start to record lidar calibration data
-  NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
-    if [ "${NUM_PROCESSES}" -eq 0 ]; then
-      nohup rosbag record -b 2048 -O lidar_calib.bag  \
-        /apollo/sensor/gnss/ins_stat \
-        /apollo/sensor/velodyne64/VelodyneScanUnified \
-        /apollo/calibration/relative_odometry \
-        </dev/null >"${LOG}" 2>&1 &
-    fi
+  NUM_PROCESSES="$(pgrep -f "rosbag record" | grep -cv '^1$')"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    nohup rosbag record -b 2048 -O lidar_calib.bag \
+      /apollo/sensor/gnss/ins_stat \
+      /apollo/sensor/velodyne64/VelodyneScanUnified \
+      /apollo/calibration/relative_odometry \
+      < /dev/null > "${LOG}" 2>&1 &
+  fi
 }
 
 function stop_record() {
@@ -123,7 +123,7 @@ function start_check_extrin() {
   MODULE="lidar_ex_checker"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
+  NUM_PROCESSES="$(pgrep -f "modules/calibration/${MODULE}" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start program, Ctrl+C to exit."
     eval "${APOLLO_BIN_PREFIX}/modules/calibration/${MODULE}/${MODULE} \
@@ -148,6 +148,14 @@ case $1 in
     ;;
   stop_check_extrin)
     stop_check_extrin
+    ;;
+  restart_record)
+    stop_record
+    start_record
+    ;;
+  restart_check_extrin)
+    stop_check_extrin
+    start_check_extrin
     ;;
   *)
     record_start

@@ -18,8 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "boost/algorithm/string.hpp"
-#include "boost/filesystem.hpp"
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/cyber.h"
@@ -153,7 +154,7 @@ int Client::DataCollectStage() {
   AINFO << "cmd [" << cmd << "]";
   std::vector<std::string> lines = GetFileLines(data_collect_time_flag_file_);
   std::ofstream time_file_handler(data_collect_time_flag_file_);
-  double now = UnixtimeNow();
+  double now = UnixNow();
   if (cmd == "start") {
     if (lines.empty()) {
       time_file_handler << now << " start\n";

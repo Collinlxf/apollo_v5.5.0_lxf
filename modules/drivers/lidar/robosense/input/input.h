@@ -25,9 +25,6 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-
-#include "cyber/cyber.h"
-
 namespace apollo {
 namespace drivers {
 namespace robosense {

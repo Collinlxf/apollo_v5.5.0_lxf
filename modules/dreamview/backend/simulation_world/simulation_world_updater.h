@@ -23,21 +23,19 @@
 #include <memory>
 #include <string>
 
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include "absl/strings/str_cat.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-
-#include "absl/strings/str_cat.h"
+#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/routing/proto/poi.pb.h"
-#include "modules/routing/proto/default_routing.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -66,6 +64,7 @@ class SimulationWorldUpdater {
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
                          WebSocketHandler *camera_ws, SimControl *sim_control,
                          const MapService *map_service,
+                         DataCollectionMonitor *data_collection_monitor,
                          PerceptionCameraUpdater *perception_camera_updater,
                          bool routing_from_file = false);
 
@@ -77,6 +76,8 @@ class SimulationWorldUpdater {
   // Time interval, in milliseconds, between pushing SimulationWorld to
   // frontend.
   static constexpr double kSimWorldTimeIntervalMs = 100;
+
+  double LastAdcTimestampSec() { return last_pushed_adc_timestamp_sec_; }
 
  private:
   /**
@@ -112,24 +113,7 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
-   /**
-   * @brief Tries to load the user-defined default routings from the txt file
-   * @return False if failed to load from file,file doesn't exist
-   * true otherwise or if it's already loaded.
-   */
-  bool LoadDefaultRoutings();
-
-  /**
-   * @brief Tries to save the points to a fixed location file
-   * @param json that contains routing name and point's coordinate x and y
-   * @return False if failed to save,
-   * true otherwise or if it's already saved.
-   */
-  bool AddDefaultRouting(const nlohmann::json &json);
-
   void RegisterMessageHandlers();
-
-  std::unique_ptr<cyber::Timer> timer_;
 
   SimulationWorldService sim_world_service_;
   const MapService *map_service_ = nullptr;
@@ -137,14 +121,11 @@ class SimulationWorldUpdater {
   WebSocketHandler *map_ws_ = nullptr;
   WebSocketHandler *camera_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
+  DataCollectionMonitor *data_collection_monitor_ = nullptr;
   PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;
-
-  // default routings
-  apollo::routing::DefaultRoutings default_routings_;
-  apollo::routing::DefaultRouting *default_routing_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.
@@ -157,6 +138,10 @@ class SimulationWorldUpdater {
   // Mutex to protect concurrent access to simulation_world_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
+
+  std::unique_ptr<cyber::Timer> timer_;
+
+  volatile double last_pushed_adc_timestamp_sec_ = 0.0f;
 };
 
 }  // namespace dreamview

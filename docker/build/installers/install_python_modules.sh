@@ -20,19 +20,15 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
-apt update -y && apt install -y \
-    libgeos-dev \
-    python-matplotlib \
-    python-pip \
-    python-psutil \
-    python-scipy \
-    software-properties-common \
-    python3-pip \
-    python3-psutil
+apt_get_update_and_install libgeos-dev
+pip3_install -r py3_requirements.txt
 
-pip2 install --no-cache-dir -r py27_requirements.txt
-pip3 install --no-cache-dir -r py3_requirements.txt
+if [ "$(uname -m)" = "x86_64" ]; then
+    pip3_install scipy grpcio-tools
+fi
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Clean up cache to reduce layer size.
+apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

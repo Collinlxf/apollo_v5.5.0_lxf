@@ -52,8 +52,27 @@ using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::PathMatcher;
 using apollo::cyber::Clock;
 
+/*
+1: C++中namespace没有命名，相当于声明的是静态全局变量
+2：
+namespace {
+int i;
+int add(int a,int b);
+}
+相当于
+static int i;
+static add(int a,int b);
+*/
 namespace {
 
+/*
+1:将参考线里面的点放到path_points里面，如果参考线由30个点组成那么path_points的大小就是30，
+path_point为中间变量表示单个的点。
+
+TODO PathPoint数据类型在哪定义的
+TODO push_back用法
+TODO std::move用法
+*/
 std::vector<PathPoint> ToDiscretizedReferenceLine(
     const std::vector<ReferencePoint>& ref_points) {
   double s = 0.0;
@@ -92,11 +111,30 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 
 }  // namespace
 
+/*
+author:lxf
+date:20230829
+1:lattice算法的主函数Plan
+2:Plan的输入：planning_start_point（规划的起点：从上一帧轨迹得到），ptr_computed_trajectory（待计算的trajectory）
+3:每一帧都有多条reference_line,reference_line是车道的中心线，这些referenc_line都是由笛卡尔坐标下一系列的点组成
+4：Lattice 算法步骤 
+  4.1 离散化参考点
+  4.2 在参考线上计算匹配点
+  4.3 根据匹配点，计算Frenet坐标系的S-L值
+  4.4 计算障碍物的s-t图
+  4.5 生成横纵向采样路径
+  4.6 计算cost,进行碰撞检测
+  4.7 优选出cost值最小的trajectory
+*/
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame,
                             ADCTrajectory* ptr_computed_trajectory) {
   size_t success_line_count = 0;
   size_t index = 0;
+  /*
+  1.遍历所有reference_line将不用reference_line的cost赋值到reference_line_info中
+  2.PlanOnReferenceLine是Lattice中最主要的一个函数
+  */
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (index != 0) {
       reference_line_info.SetPriorityCost(
@@ -127,6 +165,9 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                 "Failed to plan on any reference line.");
 }
 
+/*
+1. PlanOnReferenceLine是Lattice中最主要的一个函数
+*/
 Status LatticePlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_init_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
@@ -141,18 +182,25 @@ Status LatticePlanner::PlanOnReferenceLine(
   ++num_planning_cycles;
 
   reference_line_info->set_is_on_reference_line();
-  // 1. obtain a reference line and transform it to the PathPoint format.
+  // 1. obtain a reference line and transform it to the PathPoint format.(离散化参考线上的点)
   auto ptr_reference_line =
       std::make_shared<std::vector<PathPoint>>(ToDiscretizedReferenceLine(
           reference_line_info->reference_line().reference_points()));
 
   // 2. compute the matched point of the init planning point on the reference
-  // line.
+  // line.（在参考线上计算匹配点）
+  /*
+  1:传入参数
+    1.1ptr_reference_line为参考线信息,该信号为第一步的输出也就是被离散化的参考线
+    1.2planning_init_point.path_point().x()为车辆的x,y坐标
+  
+  */
   PathPoint matched_point = PathMatcher::MatchToPath(
       *ptr_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
 
   // 3. according to the matched point, compute the init state in Frenet frame.
+  //（根据匹配点计算Frenet左边系中的S-L图）
   std::array<double, 3> init_s;
   std::array<double, 3> init_d;
   ComputeInitFrenetState(matched_point, planning_init_point, &init_s, &init_d);
@@ -164,7 +212,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   auto ptr_prediction_querier = std::make_shared<PredictionQuerier>(
       frame->obstacles(), ptr_reference_line);
 
-  // 4. parse the decision and get the planning target.
+  // 4. parse the decision and get the planning target.(计算障碍物的s-t图)
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
       ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
       reference_line_info, init_s[0],
@@ -185,7 +233,7 @@ Status LatticePlanner::PlanOnReferenceLine(
          << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
-  // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.
+  // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.(生成横纵向采样路径)
   Trajectory1dGenerator trajectory1d_generator(
       init_s, init_d, ptr_path_time_graph, ptr_prediction_querier);
   std::vector<std::shared_ptr<Curve1d>> lon_trajectory1d_bundle;
@@ -201,6 +249,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   // dynamic constraints.
   //   second, evaluate the feasible longitudinal and lateral trajectory pairs
   //   and sort them according to the cost.
+  // 计算cost,进行碰撞检测
   TrajectoryEvaluator trajectory_evaluator(
       init_s, planning_target, lon_trajectory1d_bundle, lat_trajectory1d_bundle,
       ptr_path_time_graph, ptr_reference_line);
@@ -221,6 +270,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
+  // 优选出cost值最小的trajectory
   size_t constraint_failure_count = 0;
   size_t collision_failure_count = 0;
   size_t combined_constraint_failure_count = 0;

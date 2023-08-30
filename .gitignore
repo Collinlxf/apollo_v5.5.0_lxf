@@ -1,6 +1,5 @@
 # Bazel
 bazel-*
-WORKSPACE
 
 # Temporary files
 *.pyc
@@ -9,6 +8,7 @@ WORKSPACE
 
 # Generated files
 *.result
+py_proto
 
 # Eclipse IDE files
 .project
@@ -24,7 +24,6 @@ WORKSPACE
 
 # Atom IDE files
 *.gch
-*_pb2.py
 
 # Logs
 nohup.out
@@ -44,7 +43,6 @@ modules/tools/ota/vehicle_info.pb.txt
 modules/localization/msf/local_map/test_data/ndt_map/map_data/
 
 # Doxygen
-docs/doxygen
 cyber/doxy-docs/build/
 cyber/doxy-docs/xml/
 
@@ -55,15 +53,14 @@ third_party/can_card_library/esd_can/lib
 # Map data files
 modules/map/data
 
+#dockerfile tarballs
+docker/build/archive/
+
 # python proto
-py_proto
+*_pb2.py
 
 # calibration files
 modules/calibration/data/
-/output
-
-# Package archive
-docker/build/archive/
 
 # Data bag
 docs/demo_guide/*.bag
@@ -74,3 +71,8 @@ docs/demo_guide/*.record
 
 # bazel cache and others
 .cache/
+.apollo.bazelrc
+.errors.log
+
+# Flamegraph files
+tools/FlameGraph

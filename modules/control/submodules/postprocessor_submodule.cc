@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "cyber/time/clock.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
 #include "modules/control/common/control_gflags.h"
@@ -32,27 +34,27 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 std::string PostprocessorSubmodule::Name() const {
   return FLAGS_postprocessor_submodule_name;
 }
 
 bool PostprocessorSubmodule::Init() {
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
-                                        &control_common_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
+                                         &control_common_conf_))
       << "Unable to load control common conf file: "
       << FLAGS_control_common_conf_file;
 
   postprocessor_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
-  CHECK(postprocessor_writer_ != nullptr);
+  ACHECK(postprocessor_writer_ != nullptr);
   return true;
 }
 
 bool PostprocessorSubmodule::Proc(
     const std::shared_ptr<ControlCommand>& control_core_command) {
-  const auto start_time = Clock::Now();
+  const auto start_time = Clock::Instance()->Now();
   ControlCommand control_command;
   // get all fields from control_core_command for now
   control_command = *control_core_command;
@@ -75,7 +77,7 @@ bool PostprocessorSubmodule::Proc(
       control_core_command->header().radar_timestamp());
 
   common::util::FillHeader(Name(), &control_command);
-  const auto end_time = Clock::Now();
+  const auto end_time = Clock::Instance()->Now();
 
   // measure latency
   static apollo::common::LatencyRecorder latency_recorder(

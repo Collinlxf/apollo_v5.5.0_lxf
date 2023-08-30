@@ -17,9 +17,9 @@
 
 #include <unordered_map>
 
-#include "boost/algorithm/string/classification.hpp"
-#include "boost/algorithm/string/split.hpp"
-#include "boost/filesystem.hpp"
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/filesystem.hpp>
 
 #include "cyber/cyber.h"
 #include "cyber/proto/record.pb.h"
@@ -28,7 +28,7 @@
 namespace apollo {
 namespace hdmap {
 
-ChannelVerify::ChannelVerify(std::shared_ptr<JSonConf> sp_conf)
+ChannelVerify::ChannelVerify(std::shared_ptr<JsonConf> sp_conf)
     : sp_conf_(sp_conf) {
   Reset();
 }

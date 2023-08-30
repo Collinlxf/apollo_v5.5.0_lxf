@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -27,21 +28,20 @@ cc_library(
     name = "driver",
     srcs = [
         "driver/driver.cpp",
+        "driver/utility.cpp",
         "input/input.cpp",
     ],
     hdrs = [
         "driver/driver.h",
         "driver/utility.h",
         "input/input.h",
-        "driver/driver_param.h"
-
     ],
     copts = ROBOSENSE_COPTS,
     deps = [
         ":decoder_factory",
         "//cyber",
         "//modules/common/util",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
         "//modules/drivers/lidar/robosense/proto:robosense_proto",
     ],
 )
@@ -55,7 +55,6 @@ cc_library(
     copts = ROBOSENSE_COPTS,
     deps = [
         ":decoder_128",
-        ":decoder_80",
         ":decoder_16",
         ":decoder_32",
         ":decoder_bp",
@@ -85,15 +84,6 @@ cc_library(
     ],
     copts = ROBOSENSE_COPTS,
 )
-
-cc_library(
-    name = "decoder_80",
-    hdrs = [
-        "decoder/decoder_80.hpp",
-    ],
-    copts = ROBOSENSE_COPTS,
-)
-
 
 cc_library(
     name = "decoder_bp",

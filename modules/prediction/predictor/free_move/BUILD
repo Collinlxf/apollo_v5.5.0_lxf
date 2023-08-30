@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -27,7 +28,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/predictor/free_move:free_move_predictor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

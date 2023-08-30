@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,24 +16,26 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import json
+import sys
+
 import numpy as np
+
+from modules.tools.record_analyzer.common.distribution_analyzer import DistributionAnalyzer
+from modules.tools.record_analyzer.common.error_code_analyzer import ErrorCodeAnalyzer
+from modules.tools.record_analyzer.common.error_msg_analyzer import ErrorMsgAnalyzer
+from modules.tools.record_analyzer.common.frechet_distance import frechet_distance
+from modules.tools.record_analyzer.common.statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.common.statistical_analyzer import StatisticalAnalyzer
+from modules.tools.record_analyzer.metrics.curvature import Curvature
+from modules.tools.record_analyzer.metrics.frame_count import FrameCount
+from modules.tools.record_analyzer.metrics.latency import Latency
+from modules.tools.record_analyzer.metrics.lat_acceleration import LatAcceleration
+from modules.tools.record_analyzer.metrics.lon_acceleration import LonAcceleration
+from modules.tools.record_analyzer.metrics.reference_line import ReferenceLine
+from modules.planning.proto import planning_pb2
 from shapely.geometry import LineString, Point
 
-from modules.planning.proto import planning_pb2
-from common.statistical_analyzer import StatisticalAnalyzer
-from common.statistical_analyzer import PrintColors
-from common.distribution_analyzer import DistributionAnalyzer
-from common.error_code_analyzer import ErrorCodeAnalyzer
-from common.error_msg_analyzer import ErrorMsgAnalyzer
-from common.frechet_distance import frechet_distance
-from metrics.curvature import Curvature
-from metrics.frame_count import FrameCount
-from metrics.lat_acceleration import LatAcceleration
-from metrics.lon_acceleration import LonAcceleration
-from metrics.latency import Latency
-from metrics.reference_line import ReferenceLine
 
 class PlannigAnalyzer:
     """planning analyzer"""
@@ -60,7 +62,6 @@ class PlannigAnalyzer:
 
         self.bag_start_time_t = None
         self.print_acc = arguments.showacc
-
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
@@ -144,29 +145,29 @@ class PlannigAnalyzer:
     def print_latency_statistics(self):
         """print_latency_statistics"""
         print("\n\n")
-        print(PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Latency (ms) ---" +
+              PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.module_latency)
 
-        print(PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
+        print(PrintColors.HEADER + "--- Planning Trajectroy Type Distribution"
                                    " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.trajectory_type_dist)
 
-        print(PrintColors.HEADER + "--- Planning Estop Distribution" \
+        print(PrintColors.HEADER + "--- Planning Estop Distribution"
                                    " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.estop_reason_dist)
 
-        print(PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Error Code Distribution---" +
+              PrintColors.ENDC)
         self.error_code_analyzer.print_results()
-        print(PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Error Msg Distribution ---" +
+              PrintColors.ENDC)
         self.error_msg_analyzer.print_results()
 
-        print(PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" +
+              PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
 
     def print_sim_results(self):

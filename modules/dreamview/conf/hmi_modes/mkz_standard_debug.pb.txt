@@ -1,4 +1,10 @@
 cyber_modules {
+  key: "AudioDetection"
+  value: {
+    dag_files: "/apollo/modules/audio/dag/audio.dag"
+  }
+}
+cyber_modules {
   key: "Camera"
   value: {
     dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
@@ -32,7 +38,7 @@ cyber_modules {
 cyber_modules {
   key: "Localization"
   value: {
-    dag_files: "/apollo/modules/localization/dag/dag_streaming_msf_localization.dag"
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
 cyber_modules {
@@ -86,13 +92,13 @@ cyber_modules {
 cyber_modules {
   key: "Velodyne"
   value: {
-    dag_files: "/apollo/modules/drivers/lidar/velodyne/dag/velodyne.dag"
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
   }
 }
 cyber_modules {
-  key: "Third Party Perception"
+  key: "Microphone"
   value: {
-    dag_files: "/apollo/modules/third_party_perception/dag/third_party_perception.dag"
+    dag_files: "/apollo/modules/drivers/microphone/dag/microphone.dag"
   }
 }
 modules {

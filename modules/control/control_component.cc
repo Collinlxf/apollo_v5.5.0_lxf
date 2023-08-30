@@ -18,9 +18,9 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
-#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
@@ -31,7 +31,7 @@ using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
@@ -39,11 +39,12 @@ ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool ControlComponent::Init() {
+  injector_ = std::make_shared<DependencyInjector>();
   init_time_ = Clock::Now();
 
   AINFO << "Control init, starting ...";
 
-  CHECK(
+  ACHECK(
       cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
@@ -54,7 +55,7 @@ bool ControlComponent::Init() {
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
   if (!FLAGS_use_control_submodules &&
-      !controller_agent_.Init(&control_conf_).ok()) {
+      !controller_agent_.Init(injector_, &control_conf_).ok()) {
     // set controller
     ADEBUG << "original control";
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
@@ -67,7 +68,7 @@ bool ControlComponent::Init() {
 
   chassis_reader_ =
       node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
-  CHECK(chassis_reader_ != nullptr);
+  ACHECK(chassis_reader_ != nullptr);
 
   cyber::ReaderConfig planning_reader_config;
   planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
@@ -75,7 +76,7 @@ bool ControlComponent::Init() {
 
   trajectory_reader_ =
       node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
-  CHECK(trajectory_reader_ != nullptr);
+  ACHECK(trajectory_reader_ != nullptr);
 
   cyber::ReaderConfig localization_reader_config;
   localization_reader_config.channel_name = FLAGS_localization_topic;
@@ -84,7 +85,7 @@ bool ControlComponent::Init() {
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       localization_reader_config, nullptr);
-  CHECK(localization_reader_ != nullptr);
+  ACHECK(localization_reader_ != nullptr);
 
   cyber::ReaderConfig pad_msg_reader_config;
   pad_msg_reader_config.channel_name = FLAGS_pad_topic;
@@ -92,16 +93,16 @@ bool ControlComponent::Init() {
 
   pad_msg_reader_ =
       node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
-  CHECK(pad_msg_reader_ != nullptr);
+  ACHECK(pad_msg_reader_ != nullptr);
 
   if (!FLAGS_use_control_submodules) {
     control_cmd_writer_ =
         node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
-    CHECK(control_cmd_writer_ != nullptr);
+    ACHECK(control_cmd_writer_ != nullptr);
   } else {
     local_view_writer_ =
         node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
-    CHECK(local_view_writer_ != nullptr);
+    ACHECK(local_view_writer_ != nullptr);
   }
 
   // set initial vehicle state by cmd
@@ -355,7 +356,7 @@ bool ControlComponent::Proc() {
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
-      absl::ToDoubleSeconds(start_time - init_time_) >
+      (start_time - init_time_).ToSecond() >
           control_conf_.control_test_duration()) {
     AERROR << "Control finished testing. exit";
     return false;
@@ -394,12 +395,12 @@ bool ControlComponent::Proc() {
   }
 
   const auto end_time = Clock::Now();
+  const double time_diff_ms = (end_time - start_time).ToSecond() * 1e3;
+  ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
 
-  const double time_diff_ms = absl::ToDoubleMilliseconds(end_time - start_time);
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms > absl::ToDoubleMilliseconds(
-                         absl::Seconds(control_conf_.control_period())));
+      time_diff_ms > control_conf_.control_period() * 1e3);
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 
@@ -441,8 +442,8 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
     }
   }
 
-  VehicleStateProvider::Instance()->Update(local_view->localization(),
-                                           local_view->chassis());
+  injector_->vehicle_state()->Update(local_view->localization(),
+                                     local_view->chassis());
 
   return Status::OK();
 }

@@ -1,11 +1,9 @@
-import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
+import 'imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js';
 
-import routingPointPin from "assets/images/routing/pin.png";
+import routingPointPin from 'assets/images/routing/pin.png';
 
-import WS from "store/websocket";
-import { drawImage } from "utils/draw";
-
-const minDefaultRoutingPointsNum = 1;
+import WS from 'store/websocket';
+import { drawImage } from 'utils/draw';
 
 export default class RoutingEditor {
   constructor() {
@@ -22,7 +20,7 @@ export default class RoutingEditor {
   enableEditingMode(camera, adc) {
     this.inEditingMode = true;
 
-    const pov = "Map";
+    const pov = 'Map';
     camera.fov = PARAMETERS.camera[pov].fov;
     camera.near = PARAMETERS.camera[pov].near;
     camera.far = PARAMETERS.camera[pov].far;
@@ -38,17 +36,15 @@ export default class RoutingEditor {
     this.pointId = 0;
   }
 
-  addRoutingPoint(point, coordinates, scene, offset = true) {
-    const offsetPoint = offset ? coordinates.applyOffset({ x: point.x, y: point.y }) : point;
+  addRoutingPoint(point, coordinates, scene) {
+    const offsetPoint = coordinates.applyOffset({ x: point.x, y: point.y });
     const pointMesh = drawImage(routingPointPin, 3.5, 3.5, offsetPoint.x, offsetPoint.y, 0.3);
     pointMesh.pointId = this.pointId;
     point.id = this.pointId;
     this.pointId += 1;
     this.routePoints.push(pointMesh);
     scene.add(pointMesh);
-    if (offset) {
-      WS.checkRoutingPoint(point);
-      }
+    WS.checkRoutingPoint(point);
   }
 
   setParkingInfo(info) {
@@ -65,19 +61,19 @@ export default class RoutingEditor {
         }
         return true;
       });
-      }
+    }
   }
 
   removeLastRoutingPoint(scene) {
     const lastPoint = this.routePoints.pop();
     if (lastPoint) {
       this.removeRoutingPoint(scene, lastPoint);
-      }
+    }
   }
 
   removeAllRoutePoints(scene) {
     this.routePoints.forEach((object) => {
-        this.removeRoutingPoint(scene, object);
+      this.removeRoutingPoint(scene, object);
     });
     this.routePoints = [];
   }
@@ -92,63 +88,23 @@ export default class RoutingEditor {
     }
   }
 
-  sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
-    if (this.routePoints.length === 0 && routingPoints.length === 0) {
-      alert("Please provide at least an end point.");
-        return false;
-    }
-
-    const points = _.isEmpty(routingPoints) ?
-    this.routePoints.map((object) => {
-      object.position.z = 0;
-      return coordinates.applyOffset(object.position, true);
-    }) : routingPoints.map((point) => {
-      point.z = 0;
-      return coordinates.applyOffset(point, true);
-    });
-    const start = (points.length > 1) ? points[0]
-      : coordinates.applyOffset(carOffsetPosition, true);
-    const start_heading  = (points.length > 1) ? null : carHeading;
-    const end = points[points.length-1];
-    const waypoint = (points.length > 1) ? points.slice(1,-1) : [];
-    WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
-    return true;
-  }
-
-  sendCycleRoutingRequest(routingName, cycleRoutingPoints, cycleNumber,
-    carOffsetPosition, carHeading, coordinates) {
-    const points = cycleRoutingPoints.map((point) => {
-      point.z = 0;
-      return coordinates.applyOffset(point, true);
-    });
-    const start = coordinates.applyOffset(carOffsetPosition, true);
-    const start_heading  = carHeading;
-    const end = points[points.length - 1];
-    const waypoint = (points.length > 1) ? points.slice(0, -1) : [];
-    WS.requestDefaultCycleRouting(start, start_heading, waypoint, end, cycleNumber);
-    return true;
-  }
-
-  addDefaultRouting(routingName) {
-    if (this.routePoints.length < minDefaultRoutingPointsNum) {
-      alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
+  sendRoutingRequest(carOffsetPosition, carHeading, coordinates) {
+    if (this.routePoints.length === 0) {
+      alert('Please provide at least an end point.');
       return false;
     }
 
     const points = this.routePoints.map((object) => {
-      return object.position;
+      object.position.z = 0;
+      return coordinates.applyOffset(object.position, true);
     });
-    WS.saveDefaultRouting(routingName, points);
-  }
+    const start = (points.length > 1) ? points[0]
+      : coordinates.applyOffset(carOffsetPosition, true);
+    const start_heading = (points.length > 1) ? null : carHeading;
+    const end = points[points.length - 1];
+    const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
+    WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
 
-  checkCycleRoutingAvailable(cycleRoutingPoints, carPosition, threshold) {
-    const start = carPosition;
-    const end = cycleRoutingPoints[cycleRoutingPoints.length - 1];
-    if (_.isEmpty(start) || _.isEmpty(end)) {
-        return false;
-    }
-    const distance =
-      Math.sqrt(Math.pow((end.x - start.x), 2) + Math.pow((end.y - start.y), 2));
-    return distance > threshold;
-}
+    return true;
+  }
 }

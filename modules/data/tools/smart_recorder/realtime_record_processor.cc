@@ -16,9 +16,11 @@
 
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 
+#include <csignal>
+
 #include <algorithm>
 #include <chrono>
-#include <csignal>
+#include <limits>
 #include <set>
 #include <sstream>
 #include <thread>
@@ -34,6 +36,8 @@
 
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
+
+using Time = ::apollo::cyber::Time;
 
 namespace apollo {
 namespace data {
@@ -155,7 +159,7 @@ bool RealtimeRecordProcessor::Process() {
       break;
     }
     auto reader = std::make_shared<RecordReader>(record_path);
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    RecordViewer viewer(reader, 0, std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
           << viewer.end_time();
@@ -172,7 +176,7 @@ bool RealtimeRecordProcessor::Process() {
     }
   } while (!is_terminating_);
   // Try restore the rest of messages one last time
-  RestoreMessage(UINT64_MAX);
+  RestoreMessage(std::numeric_limits<uint64_t>::max());
   if (monitor_thread && monitor_thread->joinable()) {
     monitor_thread->join();
     monitor_thread = nullptr;
@@ -209,7 +213,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
                                             const std::string& message) const {
   SmartRecorderStatus status;
   Header* status_headerpb = status.mutable_header();
-  status_headerpb->set_timestamp_sec(cyber::Time::Now().ToSecond());
+  status_headerpb->set_timestamp_sec(Time::Now().ToSecond());
   status.set_recording_state(state);
   status.set_state_message(message);
   AINFO << "send message with state " << state << ", " << message;

@@ -21,18 +21,19 @@
 #include <string>
 #include <tuple>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include "absl/strings/str_cat.h"
-#include "boost/algorithm/string.hpp"
-#include "boost/format.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
@@ -210,7 +211,7 @@ bool LaneDetectionComponent::Init() {
                  &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
-  CHECK(visualize_.Init_all_info_single_camera(
+  ACHECK(visualize_.Init_all_info_single_camera(
       camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
       ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
       image_height_, image_width_));
@@ -290,8 +291,8 @@ void LaneDetectionComponent::OnReceiveImage(
     const double cur_time = apollo::common::time::Clock::NowInSeconds();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
           << "]";
   }
 
@@ -315,8 +316,8 @@ void LaneDetectionComponent::OnReceiveImage(
     const double end_latency =
         (end_timestamp - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
           << "]";
   }
 }
@@ -544,7 +545,7 @@ int LaneDetectionComponent::InitMotionService() {
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
   if (mot_buffer_ == nullptr) {
-    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+    mot_buffer_.reset(new base::MotionBuffer(motion_buffer_size_));
   } else {
     mot_buffer_->set_capacity(motion_buffer_size_);
   }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,30 @@ class Vcudrivereport52Test : public ::testing::Test {
 };
 
 TEST_F(Vcudrivereport52Test, reset) {
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  int32_t length = 8;
+  ChassisDetail cd;
   Vcudrivereport52 accel_cmd;
-  EXPECT_EQ(accel_cmd.GetPeriod(), 100 * 1000);
-  accel_cmd.UpdateData(data);
-  EXPECT_EQ(data[0], 0b01100111);
-  EXPECT_EQ(data[1], 0b01100010);
-  EXPECT_EQ(data[2], 0b01100011);
-  EXPECT_EQ(data[3], 0b01100100);
-  EXPECT_EQ(data[4], 0b01010001);
-  EXPECT_EQ(data[5], 0b01010010);
-  EXPECT_EQ(data[6], 0b01010011);
-  EXPECT_EQ(data[7], 0b01010100);
+  accel_cmd.Parse(data, length, &cd);
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b00000000);
+  EXPECT_EQ(data[3], 0b00000000);
+  EXPECT_EQ(data[4], 0b00000000);
+  EXPECT_EQ(data[5], 0b00000000);
+  EXPECT_EQ(data[6], 0b00000000);
+  EXPECT_EQ(data[7], 0b00000000);
+
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().drive_enable_resp(), false);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().control_mode_resp(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().vcu_real_shift(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().vcu_real_shift_valid(),
+            false);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().vcu_real_torque_valid(),
+            false);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().vcu_real_torque(), -665);
+  EXPECT_EQ(cd.neolix_edu().vcu_drive_report_52().vcu_limitedtorquemode(),
+            false);
 }
 
 }  // namespace neolix_edu

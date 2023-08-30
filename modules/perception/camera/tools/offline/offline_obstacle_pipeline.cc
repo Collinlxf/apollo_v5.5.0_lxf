@@ -14,10 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <opencv2/opencv.hpp>
-
 #include <fstream>
 #include <iomanip>
+#include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
@@ -107,7 +106,7 @@ int work() {
   init_option.conf_file = FLAGS_config_file;
   init_option.lane_calibration_working_sensor_name = FLAGS_base_camera_name;
   init_option.use_cyber_work_root = true;
-  CHECK(perception.Init(init_option));
+  ACHECK(perception.Init(init_option));
 
   // Init frame
   const int FRAME_CAPACITY = 20;
@@ -141,7 +140,7 @@ int work() {
 
   for (size_t i = 0; i < camera_names.size(); ++i) {
     data_options.sensor_name = camera_names[i];
-    CHECK(data_providers[i].Init(data_options));
+    ACHECK(data_providers[i].Init(data_options));
     name_provider_map.insert(std::pair<std::string, DataProvider *>(
         camera_names[i], &data_providers[i]));
     AINFO << "Init data_provider for " << camera_names[i];
@@ -162,12 +161,12 @@ int work() {
 
   // Init extrinsic
   TransformServer transform_server;
-  CHECK(transform_server.Init(camera_names, FLAGS_params_dir));
+  ACHECK(transform_server.Init(camera_names, FLAGS_params_dir));
   transform_server.print();
 
   // Init transform
   if (FLAGS_tf_file != "") {
-    CHECK(transform_server.LoadFromFile(FLAGS_tf_file));
+    ACHECK(transform_server.LoadFromFile(FLAGS_tf_file));
   }
 
   // Set calibration service camera_ground_height
@@ -212,7 +211,7 @@ int work() {
                                      name_camera_pitch_angle_diff_map,
                                      kDefaultPitchAngle);
   Visualizer visualize;
-  CHECK(visualize.Init(camera_names, &transform_server));
+  ACHECK(visualize.Init(camera_names, &transform_server));
   visualize.SetDirectory(FLAGS_visualize_dir);
   std::string line;
   std::string image_name;
@@ -233,10 +232,10 @@ int work() {
       image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
       cv::cvtColor(image, image, CV_GRAY2RGB);
     } else if (FLAGS_image_color == "rgb") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMAGE_COLOR);
       cv::cvtColor(image, image, CV_BGR2RGB);
     } else if (FLAGS_image_color == "bgr") {
-      image = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+      image = cv::imread(image_path, cv::IMAGE_COLOR);
     } else {
       AERROR << "Invalid color: " << FLAGS_image_color;
     }
@@ -304,7 +303,7 @@ int work() {
             << save_dir + "/" + image_name + FLAGS_image_ext;
     }
 
-    CHECK(perception.Perception(options, &frame));
+    ACHECK(perception.Perception(options, &frame));
     visualize.ShowResult(image, frame);
 
     save_dir = FLAGS_save_dir;

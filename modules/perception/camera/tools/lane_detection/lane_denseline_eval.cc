@@ -17,6 +17,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -25,7 +26,6 @@
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {
 namespace perception {
@@ -106,7 +106,7 @@ int lane_postprocessor_eval() {
     // Image data initialized
     CameraFrame frame;
     cv::Mat img = cv::imread(impath);
-    CHECK(!img.empty()) << "input image is empty.";
+    ACHECK(!img.empty()) << "input image is empty.";
     std::shared_ptr<base::SyncedMemory> img_gpu_data;
     int size = img.cols * img.rows * img.channels();
     img_gpu_data.reset(new base::SyncedMemory(size, true));
@@ -145,7 +145,7 @@ int lane_postprocessor_eval() {
     calibration_service.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
             "OnlineCalibration"));
-    CHECK(calibration_service->Init(calibration_service_init_options));
+    ACHECK(calibration_service->Init(calibration_service_init_options));
 
     std::map<std::string, float> name_camera_ground_height_map;
     std::map<std::string, float> name_camera_pitch_angle_diff_map;
@@ -156,7 +156,7 @@ int lane_postprocessor_eval() {
         pitch_angle);
     frame.calibration_service = calibration_service.get();
     // Detect the lane image
-    lib::Timer timer;
+    apollo::common::time timer;
     timer.Start();
     detector->Detect(detetor_options, &frame);
     AINFO << "Detector finished!";
@@ -177,7 +177,7 @@ int lane_postprocessor_eval() {
     lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
                                    &lane_ccs, &select_lane_ccs);
 
-    const std::vector<std::vector<LanePointInfo> >& detect_laneline_point_set =
+    const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set =
         lane_postprocessor->GetLanelinePointSet();
     if (FLAGS_lane_line_debug) {
       save_img_path = absl::StrCat(FLAGS_save_dir, "/", FLAGS_file_title, "_0_",

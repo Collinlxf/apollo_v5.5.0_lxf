@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -31,7 +32,7 @@ cc_test(
     srcs = ["cloud_mask_test.cc"],
     deps = [
         ":cloud_mask",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -96,7 +97,7 @@ cc_library(
     deps = [
         ":lidar_log",
         "//modules/perception/base",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 
@@ -108,6 +109,7 @@ cc_library(
         "//cyber",
         "//modules/perception/base:object",
         "//modules/perception/lidar/common",
+        "@com_google_googletest//:gtest",
     ],
 )
 

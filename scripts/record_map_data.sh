@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -28,23 +27,23 @@ function start() {
   # Start recording.
   record_bag_env_log
   LOG="/tmp/apollo_record.out"
-  NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
+  NUM_PROCESSES="$(pgrep -f "rosbag record" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     nohup rosbag record --split --duration=1m -b 2048 \
-        /apollo/sensor/camera/traffic/image_long \
-        /apollo/sensor/camera/traffic/image_short \
-        /apollo/sensor/gnss/best_pose \
-        /apollo/sensor/gnss/imu \
-        /apollo/sensor/gnss/odometry \
-        /apollo/sensor/gnss/raw_data \
-        /apollo/sensor/velodyne16/VelodyneScanUnified \
-        /apollo/sensor/velodyne16/PointCloud2 \
-        /apollo/sensor/velodyne16/compensator/PointCloud2 \
-        /apollo/sensor/velodyne64/VelodyneScanUnified \
-        /apollo/sensor/velodyne64/PointCloud2 \
-        /apollo/sensor/velodyne64/compensator/PointCloud2 \
-        /apollo/monitor/static_info </dev/null >"${LOG}" 2>&1 &
-    fi
+      /apollo/sensor/camera/traffic/image_long \
+      /apollo/sensor/camera/traffic/image_short \
+      /apollo/sensor/gnss/best_pose \
+      /apollo/sensor/gnss/imu \
+      /apollo/sensor/gnss/odometry \
+      /apollo/sensor/gnss/raw_data \
+      /apollo/sensor/velodyne16/VelodyneScanUnified \
+      /apollo/sensor/velodyne16/PointCloud2 \
+      /apollo/sensor/velodyne16/compensator/PointCloud2 \
+      /apollo/sensor/velodyne64/VelodyneScanUnified \
+      /apollo/sensor/velodyne64/PointCloud2 \
+      /apollo/sensor/velodyne64/compensator/PointCloud2 \
+      /apollo/monitor/static_info < /dev/null > "${LOG}" 2>&1 &
+  fi
 }
 
 function stop() {
@@ -70,6 +69,11 @@ case $1 in
   help)
     shift
     help $@
+    ;;
+  restart)
+    shift
+    stop $@
+    start $@
     ;;
   *)
     start $@

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,7 +9,7 @@ cc_test(
     srcs = ["adaptive_kalman_filter_test.cc"],
     deps = [
         ":adaptive_kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

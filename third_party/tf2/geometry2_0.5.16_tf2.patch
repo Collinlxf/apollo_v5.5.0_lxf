@@ -756,7 +756,7 @@ diff -uprN 0.5.16/src/buffer_core.cpp tf2/src/buffer_core.cpp
    }
 @@ -306,13 +316,13 @@ enum WalkEnding
  
- // TODO for Jade: Merge walkToTopParent functions; this is now a stub to preserve ABI
+ // lxfTODO for Jade: Merge walkToTopParent functions; this is now a stub to preserve ABI
  template<typename F>
 -int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const
 +int BufferCore::walkToTopParent(F& f, Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const
@@ -1090,7 +1090,7 @@ diff -uprN 0.5.16/src/buffer_core.cpp tf2/src/buffer_core.cpp
    {
 -    ros::Time latest_time;
 +    Time latest_time;
-     // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+     // lxfTODO: This is incorrect, but better than nothing.  Really we want the latest time for
      // any of the frames
      getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
 -    if (!latest_time.isZero() && time + cache_time_ < latest_time)
@@ -1124,7 +1124,7 @@ diff -uprN 0.5.16/src/buffer_core.cpp tf2/src/buffer_core.cpp
 +    Time latest_time;
      bool do_cb = false;
      TransformableResult result = TransformAvailable;
-     // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+     // lxfTODO: This is incorrect, but better than nothing.  Really we want the latest time for
      // any of the frames
      getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
 -    if (!latest_time.isZero() && req.time + cache_time_ < latest_time)

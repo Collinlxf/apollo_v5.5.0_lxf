@@ -1,18 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
-
-cc_proto_library(
-    name = "tl_preprocess_proto",
-    deps = [
-        ":tl_preprocess_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "tl_preprocess_proto_lib",
-    srcs = ["tl_preprocess.proto"],
-)
 
 cc_library(
     name = "multi_camera_projection",
@@ -34,6 +23,7 @@ cc_library(
     hdrs = ["pose.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base",
     ],
 )
@@ -44,15 +34,14 @@ cc_library(
     hdrs = ["tl_preprocessor.h"],
     deps = [
         ":multi_camera_projection",
+        ":pose",
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/interface:base_init_options",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/utils",
-        "@boost",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )

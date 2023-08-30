@@ -46,7 +46,7 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
 
   // set output feature blob data
   float* out_blob_data = nullptr;
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   log_blob_.reset(
       new base::Blob<float>(1, 1, 1, static_cast<int>(log_table_.size())));
   float* log_table = log_blob_->mutable_gpu_data();
@@ -95,7 +95,7 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
     }
 
 // memory copy direction and distance features
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
     cudaMemcpy(direction_data_, direction_data.data(),
                direction_data.size() * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(distance_data_, distance_data.data(),
@@ -153,7 +153,7 @@ void FeatureGenerator::GenerateCPU(const base::PointFCloudPtr& pc_ptr,
   }
 
   for (int i = 0; i < map_size; ++i) {
-    if (count_data_[i] <= FLT_EPSILON) {
+    if (count_data_[i] <= std::numeric_limits<float>::epsilon()) {
       max_height_data_[i] = 0.f;
     } else {
       mean_height_data_[i] /= count_data_[i];

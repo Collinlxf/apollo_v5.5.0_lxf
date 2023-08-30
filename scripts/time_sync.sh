@@ -16,26 +16,56 @@
 # limitations under the License.
 ###############################################################################
 
-sudo apt-get install -y ntpdate
+set -e
 
-grep -q ntpdate /etc/crontab
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo.bashrc"
 
-REGIN="us"
+function usage() {
+  info "${RED}Usage${NO_COLOR}: ${BOLD}${0}${NO_COLOR} <region>"
+  info "  E.g. $0 us # Sync with NTP servers for USA"
+  info "  E.g. $0 cn # Sync with NTP servers for China"
+}
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage:      ./time_sync.sh <ntp_pool_regin>"
-    echo "Example:    ./time_sync.sh cn                               # Set ntp pool to China server"
-    echo "Default using us as ntp pool regin"
-else
-    REGIN=$1
-fi
+NTPDATE_CMD="$(command -v ntpdate)"
 
-echo "Regin is set as: ${REGIN}, make sure this regin is consistent with list on pool.npt.org"
+function check_cmd_exist() {
+  if [ ! -x "${NTPDATE_CMD}" ]; then
+    warning "Command \"ntpdate\" not found. You can install it manually via:"
+    warning "  sudo apt-get -y update && sudo apt-get -y install ntpdate"
+    exit 1
+  fi
+}
 
-if [ $? -eq 1 ]; then
-    echo "*/1 * * * * root ntpdate -v -u ${REGIN}.pool.ntp.org" | sudo tee -a /etc/crontab
-fi
+REGION="us"
 
-# ntpdate running log at /var/log/syslog
+function parse_args() {
+  if [ "$#" -ne 1 ]; then
+    usage
+    exit 1
+  else
+    REGION="$(echo $1 | tr 'A-Z' 'a-z')"
+  fi
+  info "Region set to ${REGION}."
+}
 
-sudo ntpdate -v -u ${REGIN}.pool.ntp.org
+# RTFM: https://www.ntppool.org/zone/@
+
+function setup_cron_job() {
+  if grep -q ntpdate /etc/crontab; then
+    return
+  fi
+  echo "*/1 * * * * root ntpdate -v -u ${REGION}.pool.ntp.org" | sudo tee -a /etc/crontab
+  sudo /etc/init.d/cron restart
+  # sudo systemctl restart cron.service
+}
+
+function main() {
+  check_cmd_exist
+  parse_args "$@"
+  setup_cron_job
+  # ntpdate log goes to /var/log/syslog
+  sudo ntpdate -v -u ${REGION}.pool.ntp.org
+}
+
+main "$@"

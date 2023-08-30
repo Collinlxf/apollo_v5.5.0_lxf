@@ -17,6 +17,7 @@
 #ifndef LIDAR_HESAI_SRC_TYPE_DEFS_H_
 #define LIDAR_HESAI_SRC_TYPE_DEFS_H_
 
+#include <ctime>
 #include "modules/drivers/lidar/hesai/common/const_var.h"
 
 namespace apollo {
@@ -50,7 +51,7 @@ typedef struct Hesai40Packet {
 
 /************Hesai64*******************************/
 typedef struct Hesai64Header {
-  uint16_t sob;     // 0xFFEE 2bytes
+  uint16_t sob;           // 0xFFEE 2bytes
   uint8_t chLaserNumber;  // laser number 1byte
   uint8_t chBlockNumber;  // block number 1byte
   uint8_t chReturnType;   // return mode 1 byte

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/neolix_edu/neolix_edu_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -164,7 +164,7 @@ Chassis Neolix_eduController::chassis() {
   // 3
   chassis_.set_engine_started(true);
 
-  // 3 speed_mps
+  // 4 speed_mps
   if (chassis_detail.neolix_edu().has_aeb_frontwheelspeed_353() &&
       chassis_detail.neolix_edu().has_aeb_rearwheelspeed_354()) {
     auto wheelspeed = chassis_.mutable_wheel_speed();
@@ -185,17 +185,7 @@ Chassis Neolix_eduController::chassis() {
   } else {
     chassis_.set_speed_mps(0);
   }
-  // 4 SOC
-  if (chassis_detail.neolix_edu().has_vcu_vehicle_status_report_101() &&
-      chassis_detail.neolix_edu()
-          .vcu_vehicle_status_report_101()
-          .has_vcu_display_soc()) {
-    chassis_.set_battery_soc_percentage(chassis_detail.neolix_edu()
-                                            .vcu_vehicle_status_report_101()
-                                            .vcu_display_soc());
-  } else {
-    chassis_.set_battery_soc_percentage(0);
-  }
+
   // 5 steering
   if (chassis_detail.neolix_edu().has_vcu_eps_report_57() &&
       chassis_detail.neolix_edu().vcu_eps_report_57().has_vcu_real_angle()) {
@@ -476,7 +466,7 @@ void Neolix_eduController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -514,7 +504,7 @@ void Neolix_eduController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

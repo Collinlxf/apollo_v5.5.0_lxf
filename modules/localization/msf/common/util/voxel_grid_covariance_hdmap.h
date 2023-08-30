@@ -56,10 +56,12 @@
 
 #pragma once
 
+#include <cmath>  // for std::isfinite
 #include <limits>
 #include <map>
 #include <vector>
 
+#include "pcl/common/common.h"
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
@@ -102,6 +104,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
   typedef boost::shared_ptr<const pcl::VoxelGrid<PointT>> ConstPtr;
 
   struct Leaf {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Leaf()
         : nr_points_(0),
           mean_(Eigen::Vector3d::Zero()),
@@ -368,9 +371,9 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
         if (!input_->is_dense) {
           // Check if the point is invalid
-          if (!pcl_isfinite(input_->points[cp].x) ||
-              !pcl_isfinite(input_->points[cp].y) ||
-              !pcl_isfinite(input_->points[cp].z)) {
+          if (!std::isfinite(input_->points[cp].x) ||
+              !std::isfinite(input_->points[cp].y) ||
+              !std::isfinite(input_->points[cp].z)) {
             continue;
           }
         }
@@ -454,9 +457,9 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
       for (size_t cp = 0; cp < input_->points.size(); ++cp) {
         if (!input_->is_dense) {
           // Check if the point is invalid
-          if (!pcl_isfinite(input_->points[cp].x) ||
-              !pcl_isfinite(input_->points[cp].y) ||
-              !pcl_isfinite(input_->points[cp].z)) {
+          if (!std::isfinite(input_->points[cp].x) ||
+              !std::isfinite(input_->points[cp].y) ||
+              !std::isfinite(input_->points[cp].z)) {
             continue;
           }
         }

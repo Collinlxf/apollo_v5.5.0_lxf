@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -32,7 +33,7 @@ cc_test(
     srcs = ["concurrent_queue_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -42,8 +43,8 @@ cc_test(
     srcs = ["thread_pool_test.cc"],
     deps = [
         ":thread",
+        "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
-        "@gtest//:main",
     ],
 )
 
@@ -53,7 +54,7 @@ cc_test(
     srcs = ["thread_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -63,7 +64,7 @@ cc_test(
     srcs = ["thread_worker_test.cc"],
     deps = [
         ":thread",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

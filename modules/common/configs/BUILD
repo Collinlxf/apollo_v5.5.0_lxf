@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +11,7 @@ cc_library(
         "//modules/common/data:global_flagfile",
     ],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -25,9 +26,9 @@ cc_library(
         ":config_gflags",
         "//cyber/common:file",
         "//cyber/common:macros",
-        "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/common/util",
-        "@glog",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/math:geometry",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -37,7 +38,7 @@ cc_test(
     srcs = ["vehicle_config_helper_test.cc"],
     deps = [
         "vehicle_config_helper",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,17 +16,19 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
 import shutil
 import sys
+
 import yaml
-from gen_proto_file import gen_proto_file
-from gen_protocols import gen_protocols
-from gen_vehicle_controller_and_manager import gen_vehicle_controller_and_manager
-from extract_dbc_meta import extract_dbc_meta
+
+from modules.tools.gen_vehicle_protocol.gen_proto_file import gen_proto_file
+from modules.tools.gen_vehicle_protocol.gen_protocols import gen_protocols
+from modules.tools.gen_vehicle_protocol.gen_vehicle_controller_and_manager import gen_vehicle_controller_and_manager
+from modules.tools.gen_vehicle_protocol.extract_dbc_meta import extract_dbc_meta
 
 
 def gen(conf):

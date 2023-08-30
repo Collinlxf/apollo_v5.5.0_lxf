@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -23,12 +24,15 @@ cc_test(
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
+    linkopts = [
+        "-lgomp",
+    ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "//modules/prediction/predictor/junction:junction_predictor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

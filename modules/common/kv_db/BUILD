@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -6,14 +7,13 @@ cc_library(
     name = "kv_db",
     srcs = ["kv_db.cc"],
     hdrs = ["kv_db.h"],
-    linkopts = [
-        "-lsqlite3",
-    ],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/util",
         "//modules/common/util:future",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_google_absl//absl/strings",
+        "@sqlite3",
     ],
 )
 
@@ -23,7 +23,7 @@ cc_test(
     srcs = ["kv_db_test.cc"],
     deps = [
         ":kv_db",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

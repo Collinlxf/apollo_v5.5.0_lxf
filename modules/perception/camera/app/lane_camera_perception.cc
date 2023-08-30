@@ -27,13 +27,13 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -50,9 +50,9 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
       << "Read config failed: " << config_file;
-  CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
+  ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =
       options.lane_calibration_working_sensor_name;
@@ -76,7 +76,7 @@ void LaneCameraPerception::InitLane(
   for (int i = 0; i < perception_param.lane_param_size(); ++i) {
     // Initialize lane detector
     const auto &lane_param = perception_param.lane_param(i);
-    CHECK(lane_param.has_lane_detector_param())
+    ACHECK(lane_param.has_lane_detector_param())
         << "Failed to include lane_detector_param.";
     LaneDetectorInitOptions lane_detector_init_options;
     const auto &lane_detector_param = lane_param.lane_detector_param();
@@ -95,8 +95,8 @@ void LaneCameraPerception::InitLane(
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(
         lane_detector_plugin_param.name()));
-    CHECK(lane_detector_ != nullptr);
-    CHECK(lane_detector_->Init(lane_detector_init_options))
+    ACHECK(lane_detector_ != nullptr);
+    ACHECK(lane_detector_->Init(lane_detector_init_options))
         << "Failed to init: " << lane_detector_plugin_param.name();
     AINFO << "Detector: " << lane_detector_->Name();
 
@@ -115,8 +115,8 @@ void LaneCameraPerception::InitLane(
     lane_postprocessor_.reset(
         BaseLanePostprocessorRegisterer::GetInstanceByName(
             lane_postprocessor_param.name()));
-    CHECK(lane_postprocessor_ != nullptr);
-    CHECK(lane_postprocessor_->Init(postprocessor_init_options))
+    ACHECK(lane_postprocessor_ != nullptr);
+    ACHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init: " << lane_postprocessor_param.name();
     AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
 
@@ -141,7 +141,7 @@ void LaneCameraPerception::InitCalibrationService(
     const std::string &work_root, const base::BaseCameraModelPtr model,
     const app::PerceptionParam &perception_param) {
   // Init calibration service
-  CHECK(perception_param.has_calibration_service_param())
+  ACHECK(perception_param.has_calibration_service_param())
       << "Failed to include calibration_service_param";
   {
     auto calibration_service_param =
@@ -159,8 +159,8 @@ void LaneCameraPerception::InitCalibrationService(
     calibration_service_.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
             calibration_service_param.plugin_param().name()));
-    CHECK(calibration_service_ != nullptr);
-    CHECK(calibration_service_->Init(calibration_service_init_options))
+    ACHECK(calibration_service_ != nullptr);
+    ACHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init " << calibration_service_param.plugin_param().name();
     AINFO << "Calibration service: " << calibration_service_->Name();
   }
@@ -196,9 +196,9 @@ bool LaneCameraPerception::GetCalibrationService(
 
 bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
                                       CameraFrame *frame) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
 
   if (frame->calibration_service == nullptr) {
     AERROR << "Calibraion service is not available";
@@ -216,27 +216,27 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
       AERROR << "Failed to detect lane.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LaneDetector");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LaneDetector");
 
     if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 2D.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LanePostprocessor2D");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LanePostprocessor2D");
 
     // Calibration service
     frame->calibration_service->Update(frame);
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "CalibrationService");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "CalibrationService");
 
     if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 3D.";
       return false;
     }
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "LanePostprocessor3D");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "LanePostprocessor3D");
 
     if (write_out_lane_file_) {
       std::string lane_file_path =
@@ -248,8 +248,8 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
     AINFO << "Will use service sync from obstacle camera instead.";
     // fill the frame using previous estimates
     frame->calibration_service->Update(frame);
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-        frame->data_provider->sensor_name(), "CalibrationService");
+    PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                  "CalibrationService");
   }
 
   if (write_out_calib_file_) {

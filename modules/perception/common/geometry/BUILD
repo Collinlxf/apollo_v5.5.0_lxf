@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,6 +16,7 @@ cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:box",
         "//modules/perception/base:point_cloud",
     ],
@@ -55,9 +57,10 @@ cc_test(
     name = "basic_test",
     size = "small",
     srcs = ["basic_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":basic",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +70,7 @@ cc_test(
     srcs = ["camera_homography_test.cc"],
     deps = [
         ":camera_homography",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -77,7 +80,7 @@ cc_test(
     srcs = ["roi_filter_test.cc"],
     deps = [
         ":roi_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -88,7 +91,7 @@ cc_test(
     deps = [
         ":convex_hull_2d",
         "//modules/perception/base:point_cloud",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

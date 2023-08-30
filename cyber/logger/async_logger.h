@@ -27,11 +27,14 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
 #include "glog/logging.h"
+
+#include "cyber/common/macros.h"
+#include "cyber/logger/log_file_object.h"
 
 namespace apollo {
 namespace cyber {
@@ -125,7 +128,7 @@ class AsyncLogger : public google::base::Logger {
  private:
   // A buffered message.
   //
-  // TODO(todd): using std::string for buffered messages is convenient but not
+  // lxfTODO(todd): using std::string for buffered messages is convenient but not
   // as efficient as it could be. It's better to make the buffers just be
   // Arenas and allocate both the message data and Msg struct from them, forming
   // a linked list.
@@ -185,6 +188,8 @@ class AsyncLogger : public google::base::Logger {
   enum State { INITTED, RUNNING, STOPPED };
   std::atomic<State> state_ = {INITTED};
   std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
+  std::unordered_map<std::string, std::unique_ptr<LogFileObject>>
+      module_logger_map_;
 
   DISALLOW_COPY_AND_ASSIGN(AsyncLogger);
 };

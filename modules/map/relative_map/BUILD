@@ -1,6 +1,9 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
 filegroup(
     name = "relative_map_conf",
@@ -11,7 +14,7 @@ cc_library(
     name = "relative_map_lib",
     srcs = ["relative_map.cc"],
     hdrs = ["relative_map.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     data = [
         ":relative_map_conf",
     ],
@@ -22,9 +25,9 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/map/relative_map/proto:relative_map_config_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/map/relative_map/proto:relative_map_config_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
     ],
 )
 
@@ -32,16 +35,16 @@ cc_library(
     name = "navigation_lane_lib",
     srcs = ["navigation_lane.cc"],
     hdrs = ["navigation_lane.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/localization/proto:localization_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/map/relative_map/proto:relative_map_config_proto",
-        "//modules/perception/proto:perception_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/map/relative_map/proto:relative_map_config_cc_proto",
+        "//modules/perception/proto:perception_obstacle_cc_proto",
     ],
 )
 
@@ -49,18 +52,18 @@ cc_library(
     name = "relative_map_component_lib",
     srcs = ["relative_map_component.cc"],
     hdrs = ["relative_map_component.h"],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     deps = [
         ":relative_map_lib",
         "//cyber",
-        "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
 cc_binary(
     name = "librelative_map_component.so",
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
+    copts = MAP_COPTS,
     linkshared = True,
     linkstatic = False,
     deps = [":relative_map_component_lib"],
@@ -83,8 +86,8 @@ cc_test(
     ],
     deps = [
         ":relative_map_component_lib",
-        "//third_party/json",
-        "@gtest//:main",
+        "@com_github_nlohmann_json//:json",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -1,6 +1,33 @@
-# Google infras.
-absl-py
-protobuf
+# system utils
+supervisor
+psutil
 
-# Web.
+# Google infras
+absl-py
+glog
+# Use protobuf installed from source
+# protobuf
+# Note(infra): to be retired by absl-py
+python-gflags
+
+# Web
+flask
+flask-cors
 requests
+simplejson
+
+# Python tools
+pyproj
+shapely
+matplotlib
+
+# Driver
+# pyusb
+
+# Data format
+h5py
+utm
+
+# Learning
+#opencv-python
+numpy

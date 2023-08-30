@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/lidar/hesai/parser/parser.h"
+#include "modules/drivers/lidar/hesai/parser/hesai40_parser.h"
 
 namespace apollo {
 namespace drivers {
 namespace hesai {
+
+using ::apollo::cyber::Node;
+using apollo::drivers::PointXYZIT;
 
 Hesai40Parser::Hesai40Parser(const std::shared_ptr<Node> &node,
                              const Config &conf)
@@ -176,8 +179,7 @@ void Hesai40Parser::ParseRawPacket(const uint8_t *buf, const int len,
 void Hesai40Parser::CalcPointXYZIT(Hesai40Packet *pkt, int blockid) {
   Hesai40PBlock *block = &pkt->blocks[blockid];
   double unix_second = static_cast<double>(mktime(&pkt->t) + tz_second_);
-  double timestamp =
-    unix_second + (static_cast<double>(pkt->usec)) / 1000000.0;
+  double timestamp = unix_second + (static_cast<double>(pkt->usec)) / 1000000.0;
   CheckPktTime(timestamp);
 
   for (int i = 0; i < LASER_COUNT; ++i) {
@@ -200,7 +202,7 @@ void Hesai40Parser::CalcPointXYZIT(Hesai40Packet *pkt, int blockid) {
     float z = static_cast<float>(unit.distance *
                                  sinf(degreeToRadian(elev_angle_map_[i])));
 
-    PointXYZIT* new_point = raw_pointcloud_out_->add_point();
+    PointXYZIT *new_point = raw_pointcloud_out_->add_point();
     new_point->set_x(-y);
     new_point->set_y(x);
     new_point->set_z(z);
@@ -224,4 +226,3 @@ void Hesai40Parser::CalcPointXYZIT(Hesai40Packet *pkt, int blockid) {
 }  // namespace hesai
 }  // namespace drivers
 }  // namespace apollo
-

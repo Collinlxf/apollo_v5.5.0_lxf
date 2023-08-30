@@ -32,7 +32,7 @@ namespace dreamview {
 using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
-  CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
+  ACHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
       << "Unable to parse VehicleData config file "
       << FLAGS_vehicle_data_config_filename;
 }
@@ -59,13 +59,6 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
 
   // Reload vehicle config for current process.
   apollo::common::VehicleConfigHelper::Init();
-
-  // Broadcast new extrinsics.
-  static const std::string kBroadcastExtrinsicsCmd =
-      "bash /apollo/scripts/broadcast_extrinsics.sh";
-  const int ret = std::system(kBroadcastExtrinsicsCmd.c_str());
-  AERROR_IF(ret != 0) << "Command returns " << ret << ": "
-                      << kBroadcastExtrinsicsCmd;
 
   return true;
 }

@@ -81,7 +81,7 @@ class ShmDispatcher : public Dispatcher {
 template <typename MessageT>
 void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const MessageListener<MessageT>& listener) {
-  // FIXME: make it more clean
+  // lxfFIXME: make it more clean
   auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
@@ -98,7 +98,7 @@ template <typename MessageT>
 void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const RoleAttributes& opposite_attr,
                                 const MessageListener<MessageT>& listener) {
-  // FIXME: make it more clean
+  // lxfFIXME: make it more clean
   auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();

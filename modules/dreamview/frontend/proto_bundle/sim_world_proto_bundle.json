@@ -267,14 +267,6 @@
                   "type": "double",
                   "id": 27
                 },
-                "batteryPercentage": {
-                  "type": "uint32",
-                  "id": 36
-                },
-                "gearLocation": {
-                  "type": "apollo.canbus.Chassis.GearPosition",
-                  "id": 37
-                },
                 "disengageType": {
                   "type": "DisengageType",
                   "id": 28
@@ -302,6 +294,17 @@
                 "obstaclePriority": {
                   "type": "apollo.prediction.ObstaclePriority",
                   "id": 33
+                },
+                "source": {
+                  "type": "apollo.perception.PerceptionObstacle.Source",
+                  "id": 36,
+                  "options": {
+                    "default": "HOST_VEHICLE"
+                  }
+                },
+                "v2xInfo": {
+                  "type": "apollo.perception.V2XInformation",
+                  "id": 37
                 }
               },
               "nested": {
@@ -483,6 +486,15 @@
                 }
               }
             },
+            "SensorMeasurements": {
+              "fields": {
+                "sensorMeasurement": {
+                  "rule": "repeated",
+                  "type": "Object",
+                  "id": 1
+                }
+              }
+            },
             "SimulationWorld": {
               "fields": {
                 "timestamp": {
@@ -613,6 +625,18 @@
                   "keyType": "string",
                   "type": "bool",
                   "id": 28
+                },
+                "sensorMeasurements": {
+                  "keyType": "string",
+                  "type": "SensorMeasurements",
+                  "id": 29
+                },
+                "isSirenOn": {
+                  "type": "bool",
+                  "id": 30,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -816,6 +840,18 @@
         },
         "common": {
           "nested": {
+            "Direction": {
+              "values": {
+                "EAST": 0,
+                "WEST": 1,
+                "SOUTH": 2,
+                "NORTH": 3,
+                "NORTHEAST": 4,
+                "SOUTHEAST": 5,
+                "SOUTHWEST": 6,
+                "NORTHWEST": 7
+              }
+            },
             "DriveEvent": {
               "fields": {
                 "header": {
@@ -887,6 +923,7 @@
                 "CONTROL_INIT_ERROR": 1001,
                 "CONTROL_COMPUTE_ERROR": 1002,
                 "CONTROL_ESTOP_ERROR": 1003,
+                "PERFECT_CONTROL_ERROR": 1004,
                 "CANBUS_ERROR": 2000,
                 "CAN_CLIENT_ERROR_BASE": 2100,
                 "CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED": 2101,
@@ -2185,10 +2222,6 @@
                 "vehicleId": {
                   "type": "apollo.common.VehicleID",
                   "id": 33
-                },
-                "batterySocPercentage": {
-                  "type": "int32",
-                  "id": 34
                 }
               },
               "nested": {
@@ -2984,119 +3017,6 @@
                 }
               }
             },
-            "CosThetaSmootherConfig": {
-              "fields": {
-                "weightCosIncludedAngle": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 10000
-                  }
-                },
-                "weightAnchorPoints": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightLength": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 4,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 5,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 6,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0.1
-                  }
-                },
-                "ipoptUseAutomaticDifferentiation": {
-                  "type": "bool",
-                  "id": 9,
-                  "options": {
-                    "default": false
-                  }
-                }
-              }
-            },
-            "CreepDeciderConfig": {
-              "fields": {
-                "stopDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "speedLimit": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxValidStopDistance": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
-                "minBoundaryT": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 6
-                  }
-                },
-                "ignoreMaxStMinT": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 0.1
-                  }
-                },
-                "ignoreMinStMinS": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 15
-                  }
-                }
-              }
-            },
             "TargetLane": {
               "fields": {
                 "id": {
@@ -3590,362 +3510,6 @@
                 }
               }
             },
-            "SpeedHeuristicConfig": {
-              "fields": {
-                "defaultSpeedConfig": {
-                  "type": "DpStSpeedConfig",
-                  "id": 1
-                },
-                "laneChangeSpeedConfig": {
-                  "type": "DpStSpeedConfig",
-                  "id": 2
-                }
-              }
-            },
-            "DpStSpeedConfig": {
-              "fields": {
-                "unitT": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "denseDimensionS": {
-                  "type": "int32",
-                  "id": 2,
-                  "options": {
-                    "default": 41
-                  }
-                },
-                "denseUnitS": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "sparseUnitS": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "speedWeight": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "accelWeight": {
-                  "type": "double",
-                  "id": 11,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "jerkWeight": {
-                  "type": "double",
-                  "id": 12,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "obstacleWeight": {
-                  "type": "double",
-                  "id": 13,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "referenceWeight": {
-                  "type": "double",
-                  "id": 14,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "goDownBuffer": {
-                  "type": "double",
-                  "id": 15,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "goUpBuffer": {
-                  "type": "double",
-                  "id": 16,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "defaultObstacleCost": {
-                  "type": "double",
-                  "id": 20,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
-                "defaultSpeedCost": {
-                  "type": "double",
-                  "id": 31,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "exceedSpeedPenalty": {
-                  "type": "double",
-                  "id": 32,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "lowSpeedPenalty": {
-                  "type": "double",
-                  "id": 33,
-                  "options": {
-                    "default": 2.5
-                  }
-                },
-                "referenceSpeedPenalty": {
-                  "type": "double",
-                  "id": 34,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "keepClearLowSpeedPenalty": {
-                  "type": "double",
-                  "id": 35,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "accelPenalty": {
-                  "type": "double",
-                  "id": 40,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "decelPenalty": {
-                  "type": "double",
-                  "id": 41,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "positiveJerkCoeff": {
-                  "type": "double",
-                  "id": 50,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "negativeJerkCoeff": {
-                  "type": "double",
-                  "id": 51,
-                  "options": {
-                    "default": 300
-                  }
-                },
-                "maxAcceleration": {
-                  "type": "double",
-                  "id": 60,
-                  "options": {
-                    "default": 4.5
-                  }
-                },
-                "maxDeceleration": {
-                  "type": "double",
-                  "id": 61,
-                  "options": {
-                    "default": -4.5
-                  }
-                },
-                "safeTimeBuffer": {
-                  "type": "double",
-                  "id": 70,
-                  "options": {
-                    "default": 3
-                  }
-                },
-                "safeDistance": {
-                  "type": "double",
-                  "id": 71,
-                  "options": {
-                    "default": 20
-                  }
-                },
-                "spatialPotentialPenalty": {
-                  "type": "double",
-                  "id": 80,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "isLaneChanging": {
-                  "type": "bool",
-                  "id": 81,
-                  "options": {
-                    "default": false
-                  }
-                }
-              }
-            },
-            "FemPosDeviationSmootherConfig": {
-              "fields": {
-                "weightFemPosDeviation": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
-                "weightRefDeviation": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightPathLength": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "applyCurvatureConstraint": {
-                  "type": "bool",
-                  "id": 5,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "weightCurvatureConstraintSlackVar": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "curvatureConstraint": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "useSqp": {
-                  "type": "bool",
-                  "id": 8,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "sqpFtol": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.0001
-                  }
-                },
-                "sqpCtol": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0.001
-                  }
-                },
-                "sqpPenMaxIter": {
-                  "type": "int32",
-                  "id": 11,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "sqpSubMaxIter": {
-                  "type": "int32",
-                  "id": 12,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "maxIter": {
-                  "type": "int32",
-                  "id": 100,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "timeLimit": {
-                  "type": "double",
-                  "id": 101,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "verbose": {
-                  "type": "bool",
-                  "id": 102,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "scaledTermination": {
-                  "type": "bool",
-                  "id": 103,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "warmStart": {
-                  "type": "bool",
-                  "id": 104,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 200,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 201,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 202,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 203,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 204,
-                  "options": {
-                    "default": 0.1
-                  }
-                }
-              }
-            },
             "IpoptReturnStatus": {
               "values": {
                 "SOLVE_SUCCEEDED": 0,
@@ -3966,181 +3530,6 @@
                 "NONIPOPT_EXCEPTION_THROWN": -101,
                 "INSUFFICIENT_MEMORY": -102,
                 "INTERNAL_ERROR": 199
-              }
-            },
-            "LaneChangeDeciderConfig": {
-              "fields": {
-                "enableLaneChangeUrgencyCheck": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "enablePrioritizeChangeLane": {
-                  "type": "bool",
-                  "id": 2,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "enableRemoveChangeLane": {
-                  "type": "bool",
-                  "id": 3,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "recklessChangeLane": {
-                  "type": "bool",
-                  "id": 4,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "changeLaneSuccessFreezeTime": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 1.5
-                  }
-                },
-                "changeLaneFailFreezeTime": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 1
-                  }
-                }
-              }
-            },
-            "LonCondition": {
-              "fields": {
-                "s": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "ds": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "dds": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              }
-            },
-            "LatCondition": {
-              "fields": {
-                "l": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "dl": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "ddl": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              }
-            },
-            "TStrategy": {
-              "fields": {
-                "tMarkers": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "tStep": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "strategy": {
-                  "type": "string",
-                  "id": 3
-                }
-              }
-            },
-            "SStrategy": {
-              "fields": {
-                "sMarkers": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "sStep": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "strategy": {
-                  "type": "string",
-                  "id": 3
-                }
-              }
-            },
-            "LonSampleConfig": {
-              "fields": {
-                "lonEndCondition": {
-                  "type": "LonCondition",
-                  "id": 1
-                },
-                "tStrategy": {
-                  "type": "TStrategy",
-                  "id": 2
-                }
-              }
-            },
-            "LatSampleConfig": {
-              "fields": {
-                "latEndCondition": {
-                  "type": "LatCondition",
-                  "id": 1
-                },
-                "sStrategy": {
-                  "type": "SStrategy",
-                  "id": 2
-                }
-              }
-            },
-            "LatticeSamplingConfig": {
-              "fields": {
-                "lonSampleConfig": {
-                  "type": "LonSampleConfig",
-                  "id": 1
-                },
-                "latSampleConfig": {
-                  "type": "LatSampleConfig",
-                  "id": 2
-                }
               }
             },
             "StopPoint": {
@@ -4178,319 +3567,457 @@
                 }
               }
             },
-            "NaviObstacleDeciderConfig": {
+            "OverlapFeature": {
               "fields": {
-                "minNudgeDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0.2
-                  }
+                "id": {
+                  "type": "string",
+                  "id": 1
                 },
-                "maxNudgeDistance": {
+                "distance": {
                   "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1.2
-                  }
+                  "id": 2
+                }
+              }
+            },
+            "PlanningTag": {
+              "fields": {
+                "laneTurn": {
+                  "type": "apollo.hdmap.Lane.LaneTurn",
+                  "id": 1
                 },
-                "maxAllowNudgeSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 16.667
-                  }
+                "clearArea": {
+                  "type": "OverlapFeature",
+                  "id": 2
                 },
-                "safeDistance": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.2
-                  }
+                "crosswalk": {
+                  "type": "OverlapFeature",
+                  "id": 3
                 },
-                "nudgeAllowTolerance": {
+                "pncJunction": {
+                  "type": "OverlapFeature",
+                  "id": 4
+                },
+                "signal": {
+                  "type": "OverlapFeature",
+                  "id": 5
+                },
+                "stopSign": {
+                  "type": "OverlapFeature",
+                  "id": 6
+                },
+                "yieldSign": {
+                  "type": "OverlapFeature",
+                  "id": 7
+                }
+              }
+            },
+            "ChassisFeature": {
+              "fields": {
+                "messageTimestampSec": {
                   "type": "double",
+                  "id": 1
+                },
+                "speedMps": {
+                  "type": "float",
+                  "id": 2
+                },
+                "throttlePercentage": {
+                  "type": "float",
+                  "id": 3
+                },
+                "brakePercentage": {
+                  "type": "float",
+                  "id": 4
+                },
+                "steeringPercentage": {
+                  "type": "float",
+                  "id": 5
+                },
+                "gearLocation": {
+                  "type": "apollo.canbus.Chassis.GearPosition",
+                  "id": 6
+                }
+              }
+            },
+            "LocalizationFeature": {
+              "fields": {
+                "messageTimestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "position": {
+                  "type": "apollo.common.PointENU",
+                  "id": 2
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 3
+                },
+                "linearVelocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "linearAcceleration": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
+                },
+                "angularVelocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 6
+                }
+              }
+            },
+            "CommonPathPointFeature": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                },
+                "z": {
+                  "type": "double",
+                  "id": 3
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 4
+                },
+                "s": {
+                  "type": "double",
+                  "id": 5
+                },
+                "laneId": {
+                  "type": "string",
+                  "id": 6
+                }
+              }
+            },
+            "CommonTrajectoryPointFeature": {
+              "fields": {
+                "pathPoint": {
+                  "type": "CommonPathPointFeature",
+                  "id": 1
+                },
+                "v": {
+                  "type": "double",
+                  "id": 2
+                },
+                "a": {
+                  "type": "double",
+                  "id": 3
+                },
+                "relativeTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "gaussianInfo": {
+                  "type": "apollo.common.GaussianInfo",
+                  "id": 5
+                }
+              }
+            },
+            "TrajectoryPointFeature": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "type": "CommonTrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PerceptionObstacleFeature": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "position": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 3
+                },
+                "velocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "acceleration": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
+                },
+                "polygonPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point3D",
+                  "id": 6
+                }
+              }
+            },
+            "ObstacleTrajectoryFeature": {
+              "fields": {
+                "perceptionObstacleHistory": {
+                  "rule": "repeated",
+                  "type": "PerceptionObstacleFeature",
+                  "id": 1
+                },
+                "evaluatedTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PredictionTrajectoryFeature": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPointFeature",
+                  "id": 2
+                }
+              }
+            },
+            "PredictionObstacleFeature": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "predictedPeriod": {
+                  "type": "double",
+                  "id": 2
+                },
+                "intent": {
+                  "type": "apollo.prediction.ObstacleIntent",
+                  "id": 3
+                },
+                "priority": {
+                  "type": "apollo.prediction.ObstaclePriority",
+                  "id": 4
+                },
+                "isStatic": {
+                  "type": "bool",
                   "id": 5,
                   "options": {
-                    "default": 0.05
+                    "default": false
                   }
                 },
-                "cyclesNumber": {
-                  "type": "uint32",
-                  "id": 6,
-                  "options": {
-                    "default": 3
-                  }
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "PredictionTrajectoryFeature",
+                  "id": 6
+                }
+              }
+            },
+            "ObstacleFeature": {
+              "fields": {
+                "id": {
+                  "type": "int32",
+                  "id": 1
                 },
-                "judgeDisCoeff": {
+                "length": {
                   "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 2
-                  }
+                  "id": 2
                 },
-                "basisDisValue": {
+                "width": {
                   "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 30
-                  }
+                  "id": 3
                 },
-                "lateralVelocityValue": {
+                "height": {
                   "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.5
-                  }
+                  "id": 4
                 },
-                "speedDeciderDetectRange": {
+                "type": {
+                  "type": "apollo.perception.PerceptionObstacle.Type",
+                  "id": 5
+                },
+                "obstacleTrajectory": {
+                  "type": "ObstacleTrajectoryFeature",
+                  "id": 6
+                },
+                "obstaclePrediction": {
+                  "type": "PredictionObstacleFeature",
+                  "id": 7
+                }
+              }
+            },
+            "RoutingResponseFeature": {
+              "fields": {
+                "road": {
+                  "rule": "repeated",
+                  "type": "apollo.routing.RoadSegment",
+                  "id": 1
+                },
+                "measurement": {
+                  "type": "apollo.routing.Measurement",
+                  "id": 2
+                }
+              }
+            },
+            "RoutingFeature": {
+              "fields": {
+                "routingResponse": {
+                  "type": "RoutingResponseFeature",
+                  "id": 1
+                },
+                "localRoutingLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 2
+                },
+                "localRouting": {
+                  "type": "RoutingResponseFeature",
+                  "id": 3
+                }
+              }
+            },
+            "TrafficLightFeature": {
+              "fields": {
+                "color": {
+                  "type": "apollo.perception.TrafficLight.Color",
+                  "id": 1
+                },
+                "id": {
+                  "type": "string",
+                  "id": 2
+                },
+                "confidence": {
                   "type": "double",
-                  "id": 10,
+                  "id": 3,
                   "options": {
                     "default": 1
                   }
                 },
-                "maxKeepNudgeCycles": {
-                  "type": "uint32",
-                  "id": 11,
-                  "options": {
-                    "default": 100
-                  }
+                "trackingTime": {
+                  "type": "double",
+                  "id": 4
+                },
+                "blink": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "remainingTime": {
+                  "type": "double",
+                  "id": 6
                 }
               }
             },
-            "NaviPathDeciderConfig": {
+            "TrafficLightDetectionFeature": {
               "fields": {
-                "minPathLength": {
+                "messageTimestampSec": {
                   "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 5
-                  }
+                  "id": 1
                 },
-                "minLookForwardTime": {
-                  "type": "uint32",
-                  "id": 2,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "maxKeepLaneDistance": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.8
-                  }
-                },
-                "maxKeepLaneShiftY": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 20
-                  }
-                },
-                "minKeepLaneOffset": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "keepLaneShiftCompensation": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0.01
-                  }
-                },
-                "moveDestLaneConfigTalbe": {
-                  "type": "MoveDestLaneConfigTable",
-                  "id": 7
-                },
-                "moveDestLaneCompensation": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0.35
-                  }
-                },
-                "maxKappaThreshold": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "kappaMoveDestLaneCompensation": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "startPlanPointFrom": {
-                  "type": "uint32",
-                  "id": 11,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              }
-            },
-            "MoveDestLaneConfigTable": {
-              "fields": {
-                "lateralShift": {
+                "trafficLight": {
                   "rule": "repeated",
-                  "type": "ShiftConfig",
+                  "type": "TrafficLightFeature",
+                  "id": 2
+                }
+              }
+            },
+            "ADCTrajectoryPoint": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "planningTag": {
+                  "type": "PlanningTag",
+                  "id": 2
+                },
+                "trajectoryPoint": {
+                  "type": "CommonTrajectoryPointFeature",
+                  "id": 3
+                }
+              }
+            },
+            "LearningOutput": {
+              "fields": {
+                "adcFutureTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "TrajectoryPointFeature",
                   "id": 1
                 }
               }
             },
-            "ShiftConfig": {
+            "LearningDataFrame": {
               "fields": {
-                "maxSpeed": {
+                "messageTimestampSec": {
                   "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 4.16
-                  }
+                  "id": 1
                 },
-                "maxMoveDestLaneShiftY": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.4
-                  }
+                "frameNum": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "mapName": {
+                  "type": "string",
+                  "id": 3
+                },
+                "planningTag": {
+                  "type": "PlanningTag",
+                  "id": 4
+                },
+                "chassis": {
+                  "type": "ChassisFeature",
+                  "id": 5
+                },
+                "localization": {
+                  "type": "LocalizationFeature",
+                  "id": 6
+                },
+                "obstacle": {
+                  "rule": "repeated",
+                  "type": "ObstacleFeature",
+                  "id": 7
+                },
+                "routing": {
+                  "type": "RoutingFeature",
+                  "id": 8
+                },
+                "trafficLightDetection": {
+                  "type": "TrafficLightDetectionFeature",
+                  "id": 9
+                },
+                "adcTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "ADCTrajectoryPoint",
+                  "id": 10
+                },
+                "output": {
+                  "type": "LearningOutput",
+                  "id": 11
                 }
               }
             },
-            "NaviSpeedDeciderConfig": {
+            "LearningData": {
               "fields": {
-                "preferredAccel": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 2
-                  }
+                "learningDataFrame": {
+                  "rule": "repeated",
+                  "type": "LearningDataFrame",
+                  "id": 1
+                }
+              }
+            },
+            "PlanningLearningData": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
                 },
-                "preferredDecel": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "preferredJerk": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "maxAccel": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 4
-                  }
-                },
-                "maxDecel": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "obstacleBuffer": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "safeDistanceBase": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 2
-                  }
-                },
-                "safeDistanceRatio": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "followingAccelRatio": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "softCentricAccelLimit": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 1.2
-                  }
-                },
-                "hardCentricAccelLimit": {
-                  "type": "double",
-                  "id": 11,
-                  "options": {
-                    "default": 1.5
-                  }
-                },
-                "hardSpeedLimit": {
-                  "type": "double",
-                  "id": 12,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "hardAccelLimit": {
-                  "type": "double",
-                  "id": 13,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "enableSafePath": {
-                  "type": "bool",
-                  "id": 14,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "enablePlanningStartPoint": {
-                  "type": "bool",
-                  "id": 15,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "enableAccelAutoCompensation": {
-                  "type": "bool",
-                  "id": 16,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "kappaPreview": {
-                  "type": "double",
-                  "id": 17,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "kappaThreshold": {
-                  "type": "double",
-                  "id": 18,
-                  "options": {
-                    "default": 0
-                  }
+                "learningDataFrame": {
+                  "type": "LearningDataFrame",
+                  "id": 2
                 }
               }
             },
@@ -4564,73 +4091,87 @@
                   "type": "RoiType",
                   "id": 1
                 },
-                "roiLongitudinalRange": {
+                "roiLongitudinalRangeStart": {
                   "type": "double",
                   "id": 2,
                   "options": {
                     "default": 10
                   }
                 },
-                "parkingStartRange": {
+                "roiLongitudinalRangeEnd": {
                   "type": "double",
                   "id": 3,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "parkingStartRange": {
+                  "type": "double",
+                  "id": 4,
                   "options": {
                     "default": 7
                   }
                 },
                 "parkingInwards": {
                   "type": "bool",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": false
                   }
                 },
                 "enablePerceptionObstacles": {
                   "type": "bool",
-                  "id": 5
+                  "id": 6
                 },
                 "parkingDepthBuffer": {
                   "type": "double",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": 0.1
                   }
                 },
-                "roiLinesegmentMinAngle": {
+                "roiLineSegmentMinAngle": {
                   "type": "double",
-                  "id": 7,
+                  "id": 8,
                   "options": {
                     "default": 0.3
                   }
                 },
-                "roiLinesegmentLength": {
+                "roiLineSegmentLength": {
                   "type": "double",
-                  "id": 8,
+                  "id": 9,
                   "options": {
                     "default": 1
                   }
                 },
+                "roiLineSegmentLengthFromMap": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 10
+                  }
+                },
                 "perceptionObstacleFilteringDistance": {
                   "type": "double",
-                  "id": 9,
+                  "id": 11,
                   "options": {
                     "default": 1000
                   }
                 },
                 "perceptionObstacleBuffer": {
                   "type": "double",
-                  "id": 10
+                  "id": 12
                 },
-                "curbHeadingTangentChangeUppperLimit": {
+                "curbHeadingTangentChangeUpperLimit": {
                   "type": "double",
-                  "id": 11,
+                  "id": 13,
                   "options": {
                     "default": 1
                   }
                 },
                 "endPoseSDistance": {
                   "type": "double",
-                  "id": 12,
+                  "id": 14,
                   "options": {
                     "default": 10
                   }
@@ -5099,240 +4640,6 @@
                 }
               }
             },
-            "PathAssessmentDeciderConfig": {
-              "fields": {}
-            },
-            "PathBoundsDeciderConfig": {
-              "fields": {
-                "isLaneBorrowing": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "isPullOver": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "pullOverDestinationToAdcBuffer": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 25
-                  }
-                },
-                "pullOverDestinationToPathendBuffer": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "pullOverRoadEdgeBuffer": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 0.15
-                  }
-                },
-                "pullOverApproachLonDistanceAdjustFactor": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 1.5
-                  }
-                }
-              }
-            },
-            "PathDeciderConfig": {
-              "fields": {
-                "staticObstacleBuffer": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 0.3
-                  }
-                }
-              }
-            },
-            "PathLaneBorrowDeciderConfig": {
-              "fields": {
-                "allowLaneBorrowing": {
-                  "type": "bool",
-                  "id": 1
-                }
-              }
-            },
-            "PathReuseDeciderConfig": {
-              "fields": {
-                "reusePath": {
-                  "type": "bool",
-                  "id": 1
-                }
-              }
-            },
-            "PiecewiseJerkNonlinearSpeedConfig": {
-              "fields": {
-                "accWeight": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "jerkWeight": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "latAccWeight": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "sPotentialWeight": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "refVWeight": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "refSWeight": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "endSWeight": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "endVWeight": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "endAWeight": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "softSBoundWeight": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "useWarmStart": {
-                  "type": "bool",
-                  "id": 100,
-                  "options": {
-                    "default": true
-                  }
-                }
-              }
-            },
-            "PiecewiseJerkPathConfig": {
-              "fields": {
-                "defaultPathConfig": {
-                  "type": "PiecewiseJerkPathWeights",
-                  "id": 1
-                },
-                "laneChangePathConfig": {
-                  "type": "PiecewiseJerkPathWeights",
-                  "id": 2
-                }
-              }
-            },
-            "PiecewiseJerkPathWeights": {
-              "fields": {
-                "lWeight": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "dlWeight": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "ddlWeight": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1000
-                  }
-                },
-                "dddlWeight": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 10000
-                  }
-                }
-              }
-            },
-            "PiecewiseJerkSpeedConfig": {
-              "fields": {
-                "accWeight": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "jerkWeight": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "kappaPenaltyWeight": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1000
-                  }
-                },
-                "refSWeight": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "refVWeight": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 10
-                  }
-                }
-              }
-            },
             "DualWarmUpMode": {
               "values": {
                 "IPOPT": 0,
@@ -5417,23 +4724,30 @@
             },
             "ROIConfig": {
               "fields": {
-                "roiLongitudinalRange": {
+                "roiLongitudinalRangeStart": {
                   "type": "double",
                   "id": 1,
                   "options": {
                     "default": 10
                   }
                 },
-                "parkingStartRange": {
+                "roiLongitudinalRangeEnd": {
                   "type": "double",
                   "id": 2,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "parkingStartRange": {
+                  "type": "double",
+                  "id": 3,
                   "options": {
                     "default": 7
                   }
                 },
                 "parkingInwards": {
                   "type": "bool",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": false
                   }
@@ -5520,7 +4834,7 @@
                   }
                 },
                 "sCurveConfig": {
-                  "type": "PiecewiseJerkSpeedConfig",
+                  "type": "PiecewiseJerkSpeedOptimizerConfig",
                   "id": 17
                 }
               }
@@ -5938,7 +5252,7 @@
                   }
                 },
                 "sCurveConfig": {
-                  "type": "PiecewiseJerkSpeedConfig",
+                  "type": "PiecewiseJerkSpeedOptimizerConfig",
                   "id": 16
                 }
               }
@@ -5985,30 +5299,6 @@
                   "id": 6,
                   "options": {
                     "default": 0.02
-                  }
-                }
-              }
-            },
-            "ADCSignals": {
-              "fields": {
-                "signal": {
-                  "rule": "repeated",
-                  "type": "SignalType",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              },
-              "nested": {
-                "SignalType": {
-                  "values": {
-                    "LEFT_TURN": 1,
-                    "RIGHT_TURN": 2,
-                    "LOW_BEAM_LIGHT": 3,
-                    "HIGH_BEAM_LIGHT": 4,
-                    "FOG_LIGHT": 5,
-                    "EMERGENCY_LIGHT": 6
                   }
                 }
               }
@@ -6218,25 +5508,28 @@
               "oneofs": {
                 "taskConfig": {
                   "oneof": [
-                    "speedHeuristicConfig",
-                    "pathDeciderConfig",
                     "creepDeciderConfig",
-                    "openSpacePreStopDeciderConfig",
-                    "speedBoundsDeciderConfig",
-                    "piecewiseJerkPathConfig",
-                    "pathBoundsDeciderConfig",
-                    "openSpaceFallbackDeciderConfig",
-                    "openSpaceRoiDeciderConfig",
-                    "openSpaceTrajectoryProviderConfig",
-                    "openSpaceTrajectoryPartitionConfig",
-                    "pathAssessmentDeciderConfig",
-                    "piecewiseJerkSpeedConfig",
-                    "pathLaneBorrowDeciderConfig",
                     "laneChangeDeciderConfig",
-                    "ruleBasedStopDeciderConfig",
+                    "openSpaceFallbackDeciderConfig",
+                    "openSpacePreStopDeciderConfig",
+                    "openSpaceRoiDeciderConfig",
+                    "pathAssessmentDeciderConfig",
+                    "pathBoundsDeciderConfig",
+                    "pathDeciderConfig",
+                    "pathLaneBorrowDeciderConfig",
+                    "pathReferenceDeciderConfig",
                     "pathReuseDeciderConfig",
+                    "ruleBasedStopDeciderConfig",
+                    "speedBoundsDeciderConfig",
                     "stBoundsDeciderConfig",
-                    "piecewiseJerkNonlinearSpeedConfig"
+                    "openSpaceTrajectoryPartitionConfig",
+                    "openSpaceTrajectoryProviderConfig",
+                    "piecewiseJerkNonlinearSpeedOptimizerConfig",
+                    "piecewiseJerkPathOptimizerConfig",
+                    "piecewiseJerkSpeedOptimizerConfig",
+                    "speedHeuristicOptimizerConfig",
+                    "learningModelInferenceTaskConfig",
+                    "learningModelInferenceTrajectoryTaskConfig"
                   ]
                 }
               },
@@ -6245,117 +5538,129 @@
                   "type": "TaskType",
                   "id": 1
                 },
-                "speedHeuristicConfig": {
-                  "type": "SpeedHeuristicConfig",
-                  "id": 3
-                },
-                "pathDeciderConfig": {
-                  "type": "PathDeciderConfig",
-                  "id": 7
-                },
                 "creepDeciderConfig": {
                   "type": "CreepDeciderConfig",
-                  "id": 10
-                },
-                "openSpacePreStopDeciderConfig": {
-                  "type": "OpenSpacePreStopDeciderConfig",
-                  "id": 11
-                },
-                "speedBoundsDeciderConfig": {
-                  "type": "SpeedBoundsDeciderConfig",
-                  "id": 15
-                },
-                "piecewiseJerkPathConfig": {
-                  "type": "PiecewiseJerkPathConfig",
-                  "id": 16
-                },
-                "pathBoundsDeciderConfig": {
-                  "type": "PathBoundsDeciderConfig",
-                  "id": 17
-                },
-                "openSpaceFallbackDeciderConfig": {
-                  "type": "OpenSpaceFallBackDeciderConfig",
-                  "id": 18
-                },
-                "openSpaceRoiDeciderConfig": {
-                  "type": "OpenSpaceRoiDeciderConfig",
-                  "id": 19
-                },
-                "openSpaceTrajectoryProviderConfig": {
-                  "type": "OpenSpaceTrajectoryProviderConfig",
-                  "id": 20
-                },
-                "openSpaceTrajectoryPartitionConfig": {
-                  "type": "OpenSpaceTrajectoryPartitionConfig",
-                  "id": 21
-                },
-                "pathAssessmentDeciderConfig": {
-                  "type": "PathAssessmentDeciderConfig",
-                  "id": 22
-                },
-                "piecewiseJerkSpeedConfig": {
-                  "type": "PiecewiseJerkSpeedConfig",
-                  "id": 23
-                },
-                "pathLaneBorrowDeciderConfig": {
-                  "type": "PathLaneBorrowDeciderConfig",
-                  "id": 24
+                  "id": 2
                 },
                 "laneChangeDeciderConfig": {
                   "type": "LaneChangeDeciderConfig",
-                  "id": 25
+                  "id": 3
                 },
-                "ruleBasedStopDeciderConfig": {
-                  "type": "RuleBasedStopDeciderConfig",
-                  "id": 26
+                "openSpaceFallbackDeciderConfig": {
+                  "type": "OpenSpaceFallBackDeciderConfig",
+                  "id": 4
+                },
+                "openSpacePreStopDeciderConfig": {
+                  "type": "OpenSpacePreStopDeciderConfig",
+                  "id": 5
+                },
+                "openSpaceRoiDeciderConfig": {
+                  "type": "OpenSpaceRoiDeciderConfig",
+                  "id": 6
+                },
+                "pathAssessmentDeciderConfig": {
+                  "type": "PathAssessmentDeciderConfig",
+                  "id": 7
+                },
+                "pathBoundsDeciderConfig": {
+                  "type": "PathBoundsDeciderConfig",
+                  "id": 8
+                },
+                "pathDeciderConfig": {
+                  "type": "PathDeciderConfig",
+                  "id": 9
+                },
+                "pathLaneBorrowDeciderConfig": {
+                  "type": "PathLaneBorrowDeciderConfig",
+                  "id": 10
+                },
+                "pathReferenceDeciderConfig": {
+                  "type": "PathReferenceDeciderConfig",
+                  "id": 11
                 },
                 "pathReuseDeciderConfig": {
                   "type": "PathReuseDeciderConfig",
-                  "id": 27
+                  "id": 12
+                },
+                "ruleBasedStopDeciderConfig": {
+                  "type": "RuleBasedStopDeciderConfig",
+                  "id": 13
+                },
+                "speedBoundsDeciderConfig": {
+                  "type": "SpeedBoundsDeciderConfig",
+                  "id": 14
                 },
                 "stBoundsDeciderConfig": {
                   "type": "STBoundsDeciderConfig",
-                  "id": 28
+                  "id": 15
                 },
-                "piecewiseJerkNonlinearSpeedConfig": {
-                  "type": "PiecewiseJerkNonlinearSpeedConfig",
-                  "id": 29
+                "openSpaceTrajectoryPartitionConfig": {
+                  "type": "OpenSpaceTrajectoryPartitionConfig",
+                  "id": 16
+                },
+                "openSpaceTrajectoryProviderConfig": {
+                  "type": "OpenSpaceTrajectoryProviderConfig",
+                  "id": 17
+                },
+                "piecewiseJerkNonlinearSpeedOptimizerConfig": {
+                  "type": "PiecewiseJerkNonlinearSpeedOptimizerConfig",
+                  "id": 18
+                },
+                "piecewiseJerkPathOptimizerConfig": {
+                  "type": "PiecewiseJerkPathOptimizerConfig",
+                  "id": 19
+                },
+                "piecewiseJerkSpeedOptimizerConfig": {
+                  "type": "PiecewiseJerkSpeedOptimizerConfig",
+                  "id": 20
+                },
+                "speedHeuristicOptimizerConfig": {
+                  "type": "SpeedHeuristicOptimizerConfig",
+                  "id": 21
+                },
+                "learningModelInferenceTaskConfig": {
+                  "type": "LearningModelInferenceTaskConfig",
+                  "id": 22
+                },
+                "learningModelInferenceTrajectoryTaskConfig": {
+                  "type": "LearningModelInferenceTrajectoryTaskConfig",
+                  "id": 23
                 }
               },
               "nested": {
                 "TaskType": {
                   "values": {
-                    "DP_ST_SPEED_OPTIMIZER": 1,
-                    "PATH_DECIDER": 4,
-                    "SPEED_DECIDER": 5,
-                    "NAVI_PATH_DECIDER": 7,
-                    "NAVI_SPEED_DECIDER": 8,
-                    "NAVI_OBSTACLE_DECIDER": 9,
-                    "CREEP_DECIDER": 11,
-                    "OPEN_SPACE_PRE_STOP_DECIDER": 12,
-                    "DECIDER_RSS": 16,
+                    "CREEP_DECIDER": 1,
+                    "LANE_CHANGE_DECIDER": 2,
+                    "NAVI_OBSTACLE_DECIDER": 3,
+                    "NAVI_PATH_DECIDER": 4,
+                    "NAVI_SPEED_DECIDER": 5,
+                    "OPEN_SPACE_FALLBACK_DECIDER": 6,
+                    "OPEN_SPACE_PRE_STOP_DECIDER": 7,
+                    "OPEN_SPACE_ROI_DECIDER": 8,
+                    "PATH_ASSESSMENT_DECIDER": 9,
+                    "PATH_BOUNDS_DECIDER": 10,
+                    "PATH_DECIDER": 11,
+                    "PATH_LANE_BORROW_DECIDER": 12,
+                    "PATH_REFERENCE_DECIDER": 13,
+                    "PATH_REUSE_DECIDER": 14,
+                    "RSS_DECIDER": 15,
+                    "RULE_BASED_STOP_DECIDER": 16,
                     "SPEED_BOUNDS_PRIORI_DECIDER": 17,
                     "SPEED_BOUNDS_FINAL_DECIDER": 18,
-                    "PIECEWISE_JERK_PATH_OPTIMIZER": 19,
-                    "PATH_BOUNDS_DECIDER": 20,
-                    "OPEN_SPACE_ROI_DECIDER": 21,
+                    "SPEED_DECIDER": 19,
+                    "ST_BOUNDS_DECIDER": 20,
+                    "OPEN_SPACE_TRAJECTORY_PARTITION": 21,
                     "OPEN_SPACE_TRAJECTORY_PROVIDER": 22,
-                    "OPEN_SPACE_TRAJECTORY_PARTITION": 23,
-                    "OPEN_SPACE_FALLBACK_DECIDER": 24,
-                    "PATH_ASSESSMENT_DECIDER": 25,
-                    "PATH_LANE_BORROW_DECIDER": 26,
-                    "PIECEWISE_JERK_SPEED_OPTIMIZER": 27,
-                    "LANE_CHANGE_DECIDER": 28,
-                    "RULE_BASED_STOP_DECIDER": 29,
-                    "PATH_REUSE_DECIDER": 30,
-                    "ST_BOUNDS_DECIDER": 31,
-                    "PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER": 32
+                    "PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER": 23,
+                    "PIECEWISE_JERK_PATH_OPTIMIZER": 24,
+                    "PIECEWISE_JERK_SPEED_OPTIMIZER": 25,
+                    "SPEED_HEURISTIC_OPTIMIZER": 26,
+                    "LEARNING_MODEL_INFERENCE_TASK": 27,
+                    "LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK": 28
                   }
                 }
               }
-            },
-            "ScenarioLaneFollowConfig": {
-              "fields": {}
             },
             "ScenarioBareIntersectionUnprotectedConfig": {
               "fields": {
@@ -6406,6 +5711,171 @@
                   "id": 7,
                   "options": {
                     "default": 10
+                  }
+                }
+              }
+            },
+            "ScenarioEmergencyPullOverConfig": {
+              "fields": {
+                "maxStopDeceleration": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "slowDownDecelerationTime": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "targetSlowDownSpeed": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 2.5
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1.5
+                  }
+                }
+              }
+            },
+            "ScenarioEmergencyStopConfig": {
+              "fields": {
+                "maxStopDeceleration": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 6
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
+            "ScenarioLaneFollowConfig": {
+              "fields": {}
+            },
+            "ScenarioLearningModelSampleConfig": {
+              "fields": {}
+            },
+            "ScenarioNarrowStreetUTurnConfig": {
+              "fields": {}
+            },
+            "ScenarioParkAndGoConfig": {
+              "fields": {
+                "frontObstacleBuffer": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 4
+                  }
+                },
+                "headingBuffer": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "minDistToDest": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 25
+                  }
+                },
+                "maxSteeringPercentageWhenCruise": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 90
+                  }
+                }
+              }
+            },
+            "ScenarioPullOverConfig": {
+              "fields": {
+                "startPullOverScenarioDistance": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 50
+                  }
+                },
+                "pullOverMinDistanceBuffer": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "maxDistanceStopSearch": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 25
+                  }
+                },
+                "maxSErrorToEndPoint": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "maxLErrorToEndPoint": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "maxThetaErrorToEndPoint": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "maxDistanceErrorToEndPoint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "passDestinationThreshold": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "sDistanceToStopForOpenSpaceParking": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 7
                   }
                 }
               }
@@ -6587,130 +6057,6 @@
                 }
               }
             },
-            "ScenarioPullOverConfig": {
-              "fields": {
-                "startPullOverScenarioDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 50
-                  }
-                },
-                "pullOverMinDistanceBuffer": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "maxDistanceStopSearch": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 25
-                  }
-                },
-                "maxSErrorToEndPoint": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "maxLErrorToEndPoint": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "maxThetaErrorToEndPoint": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "maxDistanceErrorToEndPoint": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "passDestinationThreshold": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "maxValidStopDistance": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "sDistanceToStopForOpenSpaceParking": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 7
-                  }
-                }
-              }
-            },
-            "ScenarioEmergencyPullOverConfig": {
-              "fields": {
-                "maxStopDeceleration": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 3
-                  }
-                },
-                "slowDownDecelerationTime": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 3
-                  }
-                },
-                "targetSlowDownSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 2.5
-                  }
-                },
-                "stopDistance": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1.5
-                  }
-                }
-              }
-            },
-            "ScenarioEmergencyStopConfig": {
-              "fields": {
-                "maxStopDeceleration": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 6
-                  }
-                },
-                "stopDistance": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                }
-              }
-            },
             "ScenarioValetParkingConfig": {
               "fields": {
                 "parkingSpotRangeToStart": {
@@ -6725,41 +6071,6 @@
                   "id": 2,
                   "options": {
                     "default": 1
-                  }
-                }
-              }
-            },
-            "ScenarioNarrowStreetUTurnConfig": {
-              "fields": {}
-            },
-            "ScenarioParkAndGoConfig": {
-              "fields": {
-                "frontObstacleBuffer": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 4
-                  }
-                },
-                "headingBuffer": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "minDistToDest": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 25
-                  }
-                },
-                "maxSteeringPercentageWhenCruise": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 90
                   }
                 }
               }
@@ -6804,13 +6115,14 @@
                     "bareIntersectionUnprotectedConfig",
                     "emergencyPullOverConfig",
                     "emergencyStopConfig",
+                    "learningModelSampleConfig",
                     "narrowStreetUTurnConfig",
-                    "stopSignUnprotectedConfig",
-                    "trafficLightProtectedConfig",
-                    "trafficLightUnprotectedRightTurnConfig",
-                    "trafficLightUnprotectedLeftTurnConfig",
                     "parkAndGoConfig",
                     "pullOverConfig",
+                    "stopSignUnprotectedConfig",
+                    "trafficLightProtectedConfig",
+                    "trafficLightUnprotectedLeftTurnConfig",
+                    "trafficLightUnprotectedRightTurnConfig",
                     "valetParkingConfig",
                     "yieldSignConfig"
                   ]
@@ -6827,42 +6139,46 @@
                 },
                 "bareIntersectionUnprotectedConfig": {
                   "type": "ScenarioBareIntersectionUnprotectedConfig",
-                  "id": 4
+                  "id": 3
                 },
                 "emergencyPullOverConfig": {
                   "type": "ScenarioEmergencyPullOverConfig",
-                  "id": 5
+                  "id": 4
                 },
                 "emergencyStopConfig": {
                   "type": "ScenarioEmergencyStopConfig",
+                  "id": 5
+                },
+                "learningModelSampleConfig": {
+                  "type": "ScenarioLearningModelSampleConfig",
                   "id": 6
                 },
                 "narrowStreetUTurnConfig": {
                   "type": "ScenarioNarrowStreetUTurnConfig",
                   "id": 7
                 },
-                "stopSignUnprotectedConfig": {
-                  "type": "ScenarioStopSignUnprotectedConfig",
-                  "id": 8
-                },
-                "trafficLightProtectedConfig": {
-                  "type": "ScenarioTrafficLightProtectedConfig",
-                  "id": 9
-                },
-                "trafficLightUnprotectedRightTurnConfig": {
-                  "type": "ScenarioTrafficLightUnprotectedRightTurnConfig",
-                  "id": 10
-                },
-                "trafficLightUnprotectedLeftTurnConfig": {
-                  "type": "ScenarioTrafficLightUnprotectedLeftTurnConfig",
-                  "id": 11
-                },
                 "parkAndGoConfig": {
                   "type": "ScenarioParkAndGoConfig",
-                  "id": 12
+                  "id": 8
                 },
                 "pullOverConfig": {
                   "type": "ScenarioPullOverConfig",
+                  "id": 9
+                },
+                "stopSignUnprotectedConfig": {
+                  "type": "ScenarioStopSignUnprotectedConfig",
+                  "id": 10
+                },
+                "trafficLightProtectedConfig": {
+                  "type": "ScenarioTrafficLightProtectedConfig",
+                  "id": 11
+                },
+                "trafficLightUnprotectedLeftTurnConfig": {
+                  "type": "ScenarioTrafficLightUnprotectedLeftTurnConfig",
+                  "id": 12
+                },
+                "trafficLightUnprotectedRightTurnConfig": {
+                  "type": "ScenarioTrafficLightUnprotectedRightTurnConfig",
                   "id": 13
                 },
                 "valetParkingConfig": {
@@ -6903,7 +6219,8 @@
                     "EMERGENCY_PULL_OVER": 11,
                     "EMERGENCY_STOP": 12,
                     "NARROW_STREET_U_TURN": 13,
-                    "PARK_AND_GO": 14
+                    "PARK_AND_GO": 14,
+                    "LEARNING_MODEL_SAMPLE": 15
                   }
                 },
                 "StageType": {
@@ -6939,7 +6256,8 @@
                     "PARK_AND_GO_ADJUST": 802,
                     "PARK_AND_GO_PRE_CRUISE": 803,
                     "YIELD_SIGN_APPROACH": 900,
-                    "YIELD_SIGN_CREEP": 901
+                    "YIELD_SIGN_CREEP": 901,
+                    "LEARNING_MODEL_RUN": 1000
                   }
                 },
                 "StageConfig": {
@@ -7047,6 +6365,58 @@
                 }
               }
             },
+            "TopicConfig": {
+              "fields": {
+                "chassisTopic": {
+                  "type": "string",
+                  "id": 1
+                },
+                "hmiStatusTopic": {
+                  "type": "string",
+                  "id": 2
+                },
+                "localizationTopic": {
+                  "type": "string",
+                  "id": 3
+                },
+                "planningPadTopic": {
+                  "type": "string",
+                  "id": 4
+                },
+                "planningTrajectoryTopic": {
+                  "type": "string",
+                  "id": 5
+                },
+                "predictionTopic": {
+                  "type": "string",
+                  "id": 6
+                },
+                "relativeMapTopic": {
+                  "type": "string",
+                  "id": 7
+                },
+                "routingRequestTopic": {
+                  "type": "string",
+                  "id": 8
+                },
+                "routingResponseTopic": {
+                  "type": "string",
+                  "id": 9
+                },
+                "storyTellingTopic": {
+                  "type": "string",
+                  "id": 10
+                },
+                "trafficLightDetectionTopic": {
+                  "type": "string",
+                  "id": 11
+                },
+                "planningLearningDataTopic": {
+                  "type": "string",
+                  "id": 12
+                }
+              }
+            },
             "PlanningConfig": {
               "oneofs": {
                 "planningConfig": {
@@ -7058,22 +6428,94 @@
                 }
               },
               "fields": {
+                "topicConfig": {
+                  "type": "TopicConfig",
+                  "id": 1
+                },
+                "learningMode": {
+                  "type": "PlanningLearningMode",
+                  "id": 2
+                },
                 "rtkPlanningConfig": {
                   "type": "RtkPlanningConfig",
-                  "id": 1
+                  "id": 3
                 },
                 "standardPlanningConfig": {
                   "type": "StandardPlanningConfig",
-                  "id": 2
+                  "id": 4
                 },
                 "navigationPlanningConfig": {
                   "type": "NavigationPlanningConfig",
-                  "id": 3
+                  "id": 5
                 },
                 "defaultTaskConfig": {
                   "rule": "repeated",
                   "type": "TaskConfig",
-                  "id": 5
+                  "id": 6
+                }
+              },
+              "nested": {
+                "PlanningLearningMode": {
+                  "values": {
+                    "NO_LEARNING": 0,
+                    "E2E": 1,
+                    "HYBRID": 2,
+                    "RL_TEST": 3,
+                    "E2E_TEST": 4,
+                    "HYBRID_TEST": 5
+                  }
+                }
+              }
+            },
+            "PlanningSemanticMapConfig": {
+              "fields": {
+                "resolution": {
+                  "type": "double",
+                  "id": 1
+                },
+                "height": {
+                  "type": "int32",
+                  "id": 100
+                },
+                "width": {
+                  "type": "int32",
+                  "id": 101
+                },
+                "egoIdxX": {
+                  "type": "int32",
+                  "id": 102
+                },
+                "egoIdxY": {
+                  "type": "int32",
+                  "id": 103
+                },
+                "maxRandDeltaPhi": {
+                  "type": "double",
+                  "id": 104
+                },
+                "maxEgoFutureHorizon": {
+                  "type": "double",
+                  "id": 105
+                },
+                "maxEgoPastHorizon": {
+                  "type": "double",
+                  "id": 106
+                },
+                "maxObsFutureHorizon": {
+                  "type": "double",
+                  "id": 107
+                },
+                "maxObsPastHorizon": {
+                  "type": "double",
+                  "id": 108
+                },
+                "baseMapPadding": {
+                  "type": "int32",
+                  "id": 200
+                },
+                "cityDrivingMaxSpeed": {
+                  "type": "double",
+                  "id": 201
                 }
               }
             },
@@ -7141,6 +6583,10 @@
                 "donePncJunctionOverlapId": {
                   "type": "string",
                   "id": 2
+                },
+                "clearCounter": {
+                  "type": "uint32",
+                  "id": 3
                 }
               }
             },
@@ -7198,13 +6644,21 @@
                 }
               }
             },
+            "CreepDeciderStatus": {
+              "fields": {
+                "creepClearCounter": {
+                  "type": "uint32",
+                  "id": 1
+                }
+              }
+            },
             "StopTime": {
               "fields": {
                 "obstacleId": {
                   "type": "string",
                   "id": 1
                 },
-                "obstacleStopTimestamp": {
+                "stopTimestampSec": {
                   "type": "double",
                   "id": 2
                 }
@@ -7397,6 +6851,15 @@
                 }
               }
             },
+            "SpeedDeciderStatus": {
+              "fields": {
+                "pedestrianStopTime": {
+                  "rule": "repeated",
+                  "type": "StopTime",
+                  "id": 1
+                }
+              }
+            },
             "ScenarioStatus": {
               "fields": {
                 "scenarioType": {
@@ -7469,142 +6932,61 @@
                   "type": "ChangeLaneStatus",
                   "id": 2
                 },
+                "creepDecider": {
+                  "type": "CreepDeciderStatus",
+                  "id": 3
+                },
                 "crosswalk": {
                   "type": "CrosswalkStatus",
-                  "id": 3
+                  "id": 4
                 },
                 "destination": {
                   "type": "DestinationStatus",
-                  "id": 4
+                  "id": 5
                 },
                 "emergencyStop": {
                   "type": "EmergencyStopStatus",
-                  "id": 5
+                  "id": 6
                 },
                 "openSpace": {
                   "type": "OpenSpaceStatus",
-                  "id": 6
+                  "id": 7
                 },
                 "parkAndGo": {
                   "type": "ParkAndGoStatus",
-                  "id": 7
+                  "id": 8
                 },
                 "pathDecider": {
                   "type": "PathDeciderStatus",
-                  "id": 8
+                  "id": 9
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 9
+                  "id": 10
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 10
+                  "id": 11
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 11
+                  "id": 12
+                },
+                "speedDecider": {
+                  "type": "SpeedDeciderStatus",
+                  "id": 13
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 12
+                  "id": 14
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 13
+                  "id": 15
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 14
-                }
-              }
-            },
-            "QuadraticProgrammingProblem": {
-              "fields": {
-                "paramSize": {
-                  "type": "int32",
-                  "id": 1
-                },
-                "quadraticMatrix": {
-                  "type": "QPMatrix",
-                  "id": 2
-                },
-                "bias": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "equalityMatrix": {
-                  "type": "QPMatrix",
-                  "id": 4
-                },
-                "equalityValue": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "inequalityMatrix": {
-                  "type": "QPMatrix",
-                  "id": 6
-                },
-                "inequalityValue": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "inputMarker": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "optimalParam": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              }
-            },
-            "QPMatrix": {
-              "fields": {
-                "rowSize": {
-                  "type": "int32",
-                  "id": 1
-                },
-                "colSize": {
-                  "type": "int32",
-                  "id": 2
-                },
-                "element": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              }
-            },
-            "QuadraticProgrammingProblemSet": {
-              "fields": {
-                "problem": {
-                  "rule": "repeated",
-                  "type": "QuadraticProgrammingProblem",
-                  "id": 1
+                  "id": 16
                 }
               }
             },
@@ -7831,6 +7213,802 @@
                 }
               }
             },
+            "SLBoundary": {
+              "fields": {
+                "startS": {
+                  "type": "double",
+                  "id": 1
+                },
+                "endS": {
+                  "type": "double",
+                  "id": 2
+                },
+                "startL": {
+                  "type": "double",
+                  "id": 3
+                },
+                "endL": {
+                  "type": "double",
+                  "id": 4
+                },
+                "boundaryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.SLPoint",
+                  "id": 5
+                }
+              }
+            },
+            "STDrivableBoundaryInstance": {
+              "fields": {
+                "t": {
+                  "type": "double",
+                  "id": 1
+                },
+                "sLower": {
+                  "type": "double",
+                  "id": 2
+                },
+                "sUpper": {
+                  "type": "double",
+                  "id": 3
+                },
+                "vObsLower": {
+                  "type": "double",
+                  "id": 4
+                },
+                "vObsUpper": {
+                  "type": "double",
+                  "id": 5
+                }
+              }
+            },
+            "STDrivableBoundary": {
+              "fields": {
+                "stBoundary": {
+                  "rule": "repeated",
+                  "type": "STDrivableBoundaryInstance",
+                  "id": 1
+                }
+              }
+            },
+            "CreepDeciderConfig": {
+              "fields": {
+                "stopDistance": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "speedLimit": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.3
+                  }
+                },
+                "minBoundaryT": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 6
+                  }
+                },
+                "ignoreMaxStMinT": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "ignoreMinStMinS": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 15
+                  }
+                }
+              }
+            },
+            "LaneChangeDeciderConfig": {
+              "fields": {
+                "enableLaneChangeUrgencyCheck": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "enablePrioritizeChangeLane": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "enableRemoveChangeLane": {
+                  "type": "bool",
+                  "id": 3,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "recklessChangeLane": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "changeLaneSuccessFreezeTime": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 1.5
+                  }
+                },
+                "changeLaneFailFreezeTime": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
+            "LearningModelInferenceTaskConfig": {
+              "fields": {
+                "modelType": {
+                  "type": "ModelType",
+                  "id": 1
+                },
+                "cpuModelFile": {
+                  "type": "string",
+                  "id": 2
+                },
+                "gpuModelFile": {
+                  "type": "string",
+                  "id": 3
+                },
+                "useCuda": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "trajectoryDeltaT": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "allowEmptyLearningBasedData": {
+                  "type": "bool",
+                  "id": 6,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "allowEmptyOutputTrajectory": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                }
+              },
+              "nested": {
+                "ModelType": {
+                  "values": {
+                    "CNN": 1,
+                    "CNN_LSTM": 2
+                  }
+                }
+              }
+            },
+            "LearningModelInferenceTrajectoryTaskConfig": {
+              "fields": {
+                "minAdcFutureTrajectoryTimeLength": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 2
+                  }
+                }
+              }
+            },
+            "NaviObstacleDeciderConfig": {
+              "fields": {
+                "minNudgeDistance": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "maxNudgeDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1.2
+                  }
+                },
+                "maxAllowNudgeSpeed": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 16.667
+                  }
+                },
+                "safeDistance": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "nudgeAllowTolerance": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.05
+                  }
+                },
+                "cyclesNumber": {
+                  "type": "uint32",
+                  "id": 6,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "judgeDisCoeff": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "basisDisValue": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 30
+                  }
+                },
+                "lateralVelocityValue": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "speedDeciderDetectRange": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "maxKeepNudgeCycles": {
+                  "type": "uint32",
+                  "id": 11,
+                  "options": {
+                    "default": 100
+                  }
+                }
+              }
+            },
+            "NaviPathDeciderConfig": {
+              "fields": {
+                "minPathLength": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 5
+                  }
+                },
+                "minLookForwardTime": {
+                  "type": "uint32",
+                  "id": 2,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "maxKeepLaneDistance": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.8
+                  }
+                },
+                "maxKeepLaneShiftY": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "minKeepLaneOffset": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "keepLaneShiftCompensation": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0.01
+                  }
+                },
+                "moveDestLaneConfigTalbe": {
+                  "type": "MoveDestLaneConfigTable",
+                  "id": 7
+                },
+                "moveDestLaneCompensation": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.35
+                  }
+                },
+                "maxKappaThreshold": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "kappaMoveDestLaneCompensation": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "startPlanPointFrom": {
+                  "type": "uint32",
+                  "id": 11,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "MoveDestLaneConfigTable": {
+              "fields": {
+                "lateralShift": {
+                  "rule": "repeated",
+                  "type": "ShiftConfig",
+                  "id": 1
+                }
+              }
+            },
+            "ShiftConfig": {
+              "fields": {
+                "maxSpeed": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 4.16
+                  }
+                },
+                "maxMoveDestLaneShiftY": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.4
+                  }
+                }
+              }
+            },
+            "NaviSpeedDeciderConfig": {
+              "fields": {
+                "preferredAccel": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "preferredDecel": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "preferredJerk": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "maxAccel": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 4
+                  }
+                },
+                "maxDecel": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 5
+                  }
+                },
+                "obstacleBuffer": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "safeDistanceBase": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "safeDistanceRatio": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "followingAccelRatio": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "softCentricAccelLimit": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 1.2
+                  }
+                },
+                "hardCentricAccelLimit": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 1.5
+                  }
+                },
+                "hardSpeedLimit": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "hardAccelLimit": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "enableSafePath": {
+                  "type": "bool",
+                  "id": 14,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "enablePlanningStartPoint": {
+                  "type": "bool",
+                  "id": 15,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "enableAccelAutoCompensation": {
+                  "type": "bool",
+                  "id": 16,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "kappaPreview": {
+                  "type": "double",
+                  "id": 17,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "kappaThreshold": {
+                  "type": "double",
+                  "id": 18,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "PathAssessmentDeciderConfig": {
+              "fields": {}
+            },
+            "PathBoundsDeciderConfig": {
+              "fields": {
+                "isLaneBorrowing": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "isPullOver": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "pullOverDestinationToAdcBuffer": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 25
+                  }
+                },
+                "pullOverDestinationToPathendBuffer": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "pullOverRoadEdgeBuffer": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.15
+                  }
+                },
+                "pullOverApproachLonDistanceAdjustFactor": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 1.5
+                  }
+                },
+                "adcBufferCoeff": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "isExtendLaneBoundsToIncludeAdc": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
+            "PathDeciderConfig": {
+              "fields": {
+                "staticObstacleBuffer": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.3
+                  }
+                }
+              }
+            },
+            "PathLaneBorrowDeciderConfig": {
+              "fields": {
+                "allowLaneBorrowing": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
+            },
+            "PathReferenceDeciderConfig": {
+              "fields": {
+                "minPathReferenceLength": {
+                  "type": "uint32",
+                  "id": 1,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "weightXRefPathReference": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "PathReuseDeciderConfig": {
+              "fields": {
+                "reusePath": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
+            },
+            "PiecewiseJerkNonlinearSpeedOptimizerConfig": {
+              "fields": {
+                "accWeight": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "jerkWeight": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "latAccWeight": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "sPotentialWeight": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "refVWeight": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "refSWeight": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endSWeight": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endVWeight": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endAWeight": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "softSBoundWeight": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "useWarmStart": {
+                  "type": "bool",
+                  "id": 100,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
+            "PiecewiseJerkPathOptimizerConfig": {
+              "fields": {
+                "defaultPathConfig": {
+                  "type": "PiecewiseJerkPathWeights",
+                  "id": 1
+                },
+                "laneChangePathConfig": {
+                  "type": "PiecewiseJerkPathWeights",
+                  "id": 2
+                },
+                "pathReferenceLWeight": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "PiecewiseJerkPathWeights": {
+              "fields": {
+                "lWeight": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "dlWeight": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "ddlWeight": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1000
+                  }
+                },
+                "dddlWeight": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10000
+                  }
+                }
+              }
+            },
+            "PiecewiseJerkSpeedOptimizerConfig": {
+              "fields": {
+                "accWeight": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "jerkWeight": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "kappaPenaltyWeight": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1000
+                  }
+                },
+                "refSWeight": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "refVWeight": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 10
+                  }
+                }
+              }
+            },
             "RuleBasedStopDeciderConfig": {
               "fields": {
                 "maxAdcStopSpeed": {
@@ -7888,31 +8066,6 @@
                   "options": {
                     "default": 50
                   }
-                }
-              }
-            },
-            "SLBoundary": {
-              "fields": {
-                "startS": {
-                  "type": "double",
-                  "id": 1
-                },
-                "endS": {
-                  "type": "double",
-                  "id": 2
-                },
-                "startL": {
-                  "type": "double",
-                  "id": 3
-                },
-                "endL": {
-                  "type": "double",
-                  "id": 4
-                },
-                "boundaryPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.SLPoint",
-                  "id": 5
                 }
               }
             },
@@ -7977,27 +8130,207 @@
                 }
               }
             },
-            "SpiralCurveConfig": {
+            "SpeedHeuristicOptimizerConfig": {
               "fields": {
-                "simpsonSize": {
-                  "type": "int32",
+                "defaultSpeedConfig": {
+                  "type": "DpStSpeedOptimizerConfig",
+                  "id": 1
+                },
+                "laneChangeSpeedConfig": {
+                  "type": "DpStSpeedOptimizerConfig",
+                  "id": 2
+                }
+              }
+            },
+            "DpStSpeedOptimizerConfig": {
+              "fields": {
+                "unitT": {
+                  "type": "double",
                   "id": 1,
                   "options": {
-                    "default": 9
+                    "default": 1
                   }
                 },
-                "newtonRaphsonTol": {
-                  "type": "double",
+                "denseDimensionS": {
+                  "type": "int32",
                   "id": 2,
                   "options": {
-                    "default": 0.01
+                    "default": 41
                   }
                 },
-                "newtonRaphsonMaxIter": {
-                  "type": "int32",
+                "denseUnitS": {
+                  "type": "double",
                   "id": 3,
                   "options": {
+                    "default": 0.5
+                  }
+                },
+                "sparseUnitS": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "speedWeight": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "accelWeight": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "jerkWeight": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "obstacleWeight": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "referenceWeight": {
+                  "type": "double",
+                  "id": 14,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "goDownBuffer": {
+                  "type": "double",
+                  "id": 15,
+                  "options": {
+                    "default": 5
+                  }
+                },
+                "goUpBuffer": {
+                  "type": "double",
+                  "id": 16,
+                  "options": {
+                    "default": 5
+                  }
+                },
+                "defaultObstacleCost": {
+                  "type": "double",
+                  "id": 20,
+                  "options": {
+                    "default": 10000000000
+                  }
+                },
+                "defaultSpeedCost": {
+                  "type": "double",
+                  "id": 31,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "exceedSpeedPenalty": {
+                  "type": "double",
+                  "id": 32,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "lowSpeedPenalty": {
+                  "type": "double",
+                  "id": 33,
+                  "options": {
+                    "default": 2.5
+                  }
+                },
+                "referenceSpeedPenalty": {
+                  "type": "double",
+                  "id": 34,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "keepClearLowSpeedPenalty": {
+                  "type": "double",
+                  "id": 35,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "accelPenalty": {
+                  "type": "double",
+                  "id": 40,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "decelPenalty": {
+                  "type": "double",
+                  "id": 41,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "positiveJerkCoeff": {
+                  "type": "double",
+                  "id": 50,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "negativeJerkCoeff": {
+                  "type": "double",
+                  "id": 51,
+                  "options": {
+                    "default": 300
+                  }
+                },
+                "maxAcceleration": {
+                  "type": "double",
+                  "id": 60,
+                  "options": {
+                    "default": 4.5
+                  }
+                },
+                "maxDeceleration": {
+                  "type": "double",
+                  "id": 61,
+                  "options": {
+                    "default": -4.5
+                  }
+                },
+                "safeTimeBuffer": {
+                  "type": "double",
+                  "id": 70,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "safeDistance": {
+                  "type": "double",
+                  "id": 71,
+                  "options": {
                     "default": 20
+                  }
+                },
+                "spatialPotentialPenalty": {
+                  "type": "double",
+                  "id": 80,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "isLaneChanging": {
+                  "type": "bool",
+                  "id": 81,
+                  "options": {
+                    "default": false
                   }
                 }
               }
@@ -8010,39 +8343,6 @@
                   "options": {
                     "default": 7
                   }
-                }
-              }
-            },
-            "STDrivableBoundaryInstance": {
-              "fields": {
-                "t": {
-                  "type": "double",
-                  "id": 1
-                },
-                "sLower": {
-                  "type": "double",
-                  "id": 2
-                },
-                "sUpper": {
-                  "type": "double",
-                  "id": 3
-                },
-                "vObsLower": {
-                  "type": "double",
-                  "id": 4
-                },
-                "vObsUpper": {
-                  "type": "double",
-                  "id": 5
-                }
-              }
-            },
-            "STDrivableBoundary": {
-              "fields": {
-                "stBoundary": {
-                  "rule": "repeated",
-                  "type": "STDrivableBoundaryInstance",
-                  "id": 1
                 }
               }
             },
@@ -8347,6 +8647,313 @@
                 "config": {
                   "rule": "repeated",
                   "type": "TrafficRuleConfig",
+                  "id": 1
+                }
+              }
+            },
+            "CosThetaSmootherConfig": {
+              "fields": {
+                "weightCosIncludedAngle": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 10000
+                  }
+                },
+                "weightAnchorPoints": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightLength": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 5,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 6,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "ipoptUseAutomaticDifferentiation": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "default": false
+                  }
+                }
+              }
+            },
+            "FemPosDeviationSmootherConfig": {
+              "fields": {
+                "weightFemPosDeviation": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10000000000
+                  }
+                },
+                "weightRefDeviation": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightPathLength": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "applyCurvatureConstraint": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightCurvatureConstraintSlackVar": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "curvatureConstraint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "useSqp": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "sqpFtol": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.0001
+                  }
+                },
+                "sqpCtol": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.001
+                  }
+                },
+                "sqpPenMaxIter": {
+                  "type": "int32",
+                  "id": 11,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "sqpSubMaxIter": {
+                  "type": "int32",
+                  "id": 12,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "maxIter": {
+                  "type": "int32",
+                  "id": 100,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "timeLimit": {
+                  "type": "double",
+                  "id": 101,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "verbose": {
+                  "type": "bool",
+                  "id": 102,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "scaledTermination": {
+                  "type": "bool",
+                  "id": 103,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "warmStart": {
+                  "type": "bool",
+                  "id": 104,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 200,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 201,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 202,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 203,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 204,
+                  "options": {
+                    "default": 0.1
+                  }
+                }
+              }
+            },
+            "QuadraticProgrammingProblem": {
+              "fields": {
+                "paramSize": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "quadraticMatrix": {
+                  "type": "QPMatrix",
+                  "id": 2
+                },
+                "bias": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "equalityMatrix": {
+                  "type": "QPMatrix",
+                  "id": 4
+                },
+                "equalityValue": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "inequalityMatrix": {
+                  "type": "QPMatrix",
+                  "id": 6
+                },
+                "inequalityValue": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "inputMarker": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "optimalParam": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "QPMatrix": {
+              "fields": {
+                "rowSize": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "colSize": {
+                  "type": "int32",
+                  "id": 2
+                },
+                "element": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              }
+            },
+            "QuadraticProgrammingProblemSet": {
+              "fields": {
+                "problem": {
+                  "rule": "repeated",
+                  "type": "QuadraticProgrammingProblem",
                   "id": 1
                 }
               }
@@ -8900,6 +9507,21 @@
                 "futureCollisionPoint": {
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 17
+                },
+                "timeLatency": {
+                  "type": "double",
+                  "id": 18,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "originPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 19
+                },
+                "originHeadingRad": {
+                  "type": "double",
+                  "id": 20
                 }
               }
             },
@@ -9054,6 +9676,10 @@
                 "pullOver": {
                   "type": "PullOverDebug",
                   "id": 29
+                },
+                "hybridModel": {
+                  "type": "HybridModelDebug",
+                  "id": 30
                 }
               }
             },
@@ -9161,6 +9787,29 @@
                   "rule": "repeated",
                   "type": "apollo.common.Path",
                   "id": 1
+                }
+              }
+            },
+            "HybridModelDebug": {
+              "fields": {
+                "usingLearningModelOutput": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "learningModelOutputUsageRatio": {
+                  "type": "double",
+                  "id": 2
+                },
+                "learningModelOutputFailReason": {
+                  "type": "string",
+                  "id": 3
+                },
+                "evaluatedPathReference": {
+                  "type": "apollo.common.Path",
+                  "id": 4
                 }
               }
             }
@@ -9389,6 +10038,27 @@
                 }
               }
             },
+            "V2XInformation": {
+              "fields": {
+                "v2xType": {
+                  "rule": "repeated",
+                  "type": "V2XType",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                }
+              },
+              "nested": {
+                "V2XType": {
+                  "values": {
+                    "NONE": 0,
+                    "ZOMBIES_CAR": 1,
+                    "BLIND_ZONE": 2
+                  }
+                }
+              }
+            },
             "SensorMeasurement": {
               "fields": {
                 "sensorId": {
@@ -9438,6 +10108,28 @@
                 "box": {
                   "type": "BBox2D",
                   "id": 12
+                }
+              }
+            },
+            "Trajectory": {
+              "fields": {
+                "probability": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "DebugMessage": {
+              "fields": {
+                "trajectory": {
+                  "rule": "repeated",
+                  "type": "Trajectory",
+                  "id": 1
                 }
               }
             },
@@ -9561,6 +10253,21 @@
                 "lightStatus": {
                   "type": "LightStatus",
                   "id": 25
+                },
+                "msg": {
+                  "type": "DebugMessage",
+                  "id": 26
+                },
+                "source": {
+                  "type": "Source",
+                  "id": 27,
+                  "options": {
+                    "default": "HOST_VEHICLE"
+                  }
+                },
+                "v2xInfo": {
+                  "type": "V2XInformation",
+                  "id": 28
                 }
               },
               "nested": {
@@ -9595,6 +10302,12 @@
                     "ST_TRICYCLIST": 9,
                     "ST_PEDESTRIAN": 10,
                     "ST_TRAFFICCONE": 11
+                  }
+                },
+                "Source": {
+                  "values": {
+                    "HOST_VEHICLE": 0,
+                    "V2X": 1
                   }
                 }
               }
@@ -10004,6 +10717,11 @@
                   "rule": "repeated",
                   "type": "PNCJunction",
                   "id": 13
+                },
+                "rsu": {
+                  "rule": "repeated",
+                  "type": "RSU",
+                  "id": 14
                 }
               }
             },
@@ -10369,6 +11087,9 @@
             "PNCJunctionOverlapInfo": {
               "fields": {}
             },
+            "RSUOverlapInfo": {
+              "fields": {}
+            },
             "RegionOverlapInfo": {
               "fields": {
                 "id": {
@@ -10395,7 +11116,8 @@
                     "clearAreaOverlapInfo",
                     "speedBumpOverlapInfo",
                     "parkingSpaceOverlapInfo",
-                    "pncJunctionOverlapInfo"
+                    "pncJunctionOverlapInfo",
+                    "rsuOverlapInfo"
                   ]
                 }
               },
@@ -10443,6 +11165,10 @@
                 "pncJunctionOverlapInfo": {
                   "type": "PNCJunctionOverlapInfo",
                   "id": 12
+                },
+                "rsuOverlapInfo": {
+                  "type": "RSUOverlapInfo",
+                  "id": 13
                 }
               }
             },
@@ -10680,6 +11406,23 @@
                     "CITY_ROAD": 2,
                     "PARK": 3
                   }
+                }
+              }
+            },
+            "RSU": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "junctionId": {
+                  "type": "Id",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
                 }
               }
             },
@@ -11208,6 +11951,16 @@
                   "rule": "repeated",
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 34
+                },
+                "surroundingLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 35
+                },
+                "withinLaneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 36
                 }
               }
             },
@@ -11994,6 +12747,76 @@
                 "navigationLane": {
                   "type": "NavigationLaneConfig",
                   "id": 2
+                }
+              }
+            }
+          }
+        },
+        "audio": {
+          "nested": {
+            "MovingResult": {
+              "values": {
+                "UNKNOWN": 0,
+                "APPROACHING": 1,
+                "DEPARTING": 2,
+                "STATIONARY": 3
+              }
+            },
+            "AudioType": {
+              "values": {
+                "UNKNOWN_TYPE": 0,
+                "POLICE": 1,
+                "AMBULANCE": 2,
+                "FIRETRUCK": 3
+              }
+            },
+            "AudioDirection": {
+              "values": {
+                "UNKNOWN_DIRECTION": 0,
+                "FRONT": 1,
+                "LEFT": 2,
+                "BACK": 3,
+                "RIGHT": 4
+              }
+            },
+            "AudioEvent": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "id": {
+                  "type": "int32",
+                  "id": 2
+                },
+                "movingResult": {
+                  "type": "apollo.audio.MovingResult",
+                  "id": 3,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                },
+                "audioType": {
+                  "type": "apollo.audio.AudioType",
+                  "id": 4,
+                  "options": {
+                    "default": "UNKNOWN_TYPE"
+                  }
+                },
+                "sirenIsOn": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "audioDirection": {
+                  "type": "apollo.audio.AudioDirection",
+                  "id": 6,
+                  "options": {
+                    "default": "UNKNOWN_DIRECTION"
+                  }
+                },
+                "pose": {
+                  "type": "apollo.localization.Pose",
+                  "id": 7
                 }
               }
             }

@@ -95,8 +95,9 @@ void ClassifyBySimple::Init(
         << input_reshape[net_inputs_[0]][1] << ", "
         << input_reshape[net_inputs_[0]][2] << ", "
         << input_reshape[net_inputs_[0]][3];
+
   if (!rt_net_->Init(input_reshape)) {
-    AINFO << "net init fail.";
+    AWARN << "net init fail.";
   }
 
   image_.reset(
@@ -112,6 +113,7 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
     return;
   }
   std::shared_ptr<base::Blob<uint8_t>> rectified_blob;
+
   auto input_blob_recog = rt_net_->get_blob(net_inputs_[0]);
   auto output_blob_recog = rt_net_->get_blob(net_outputs_[0]);
 
@@ -122,15 +124,15 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
 
     data_provider_image_option_.crop_roi = light->region.detection_roi;
     data_provider_image_option_.do_crop = true;
-    data_provider_image_option_.target_color = base::Color::BGR;
+    data_provider_image_option_.target_color = base::Color::RGB;
     frame->data_provider->GetImage(data_provider_image_option_, image_.get());
 
     AINFO << "get img done";
 
-    const float* mean = mean_.get()->cpu_data();
+    const float* mean = mean_->cpu_data();
     inference::ResizeGPU(*image_, input_blob_recog,
-                         frame->data_provider->src_width(), 0, mean[0], mean[1],
-                         mean[2], true, scale_);
+                         frame->data_provider->src_width(), 0, mean[0],
+                         mean[1], mean[2], true, scale_);
 
     AINFO << "resize gpu finish.";
     cudaDeviceSynchronize();
@@ -147,9 +149,9 @@ void ClassifyBySimple::Prob2Color(const float* out_put_data, float threshold,
                                   base::TrafficLightPtr light) {
   int max_color_id = 0;
   std::vector<base::TLColor> status_map = {
-      base::TLColor::TL_BLACK, base::TLColor::TL_RED, base::TLColor::TL_YELLOW,
-      base::TLColor::TL_GREEN};
-  std::vector<std::string> name_map = {"Black", "Red", "Yellow", "Green"};
+      base::TLColor::TL_GREEN, base::TLColor::TL_RED, base::TLColor::TL_YELLOW,
+      base::TLColor::TL_BLACK};
+  std::vector<std::string> name_map = {"Green", "Red", "Yellow", "Black"};
   std::vector<float> prob(out_put_data, out_put_data + status_map.size());
   auto max_prob = std::max_element(prob.begin(), prob.end());
   max_color_id = (*max_prob > threshold)

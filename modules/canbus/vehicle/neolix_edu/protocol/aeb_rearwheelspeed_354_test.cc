@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ class Aebrearwheelspeed354Test : public ::testing::Test {
 
 TEST_F(Aebrearwheelspeed354Test, reset) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  int32_t length = 8;
+  ChassisDetail cd;
   Aebrearwheelspeed354 accel_cmd;
-  EXPECT_EQ(accel_cmd.GetPeriod(), 100 * 1000);
-  accel_cmd.UpdateData(data);
+  accel_cmd.Parse(data, length, &cd);
   EXPECT_EQ(data[0], 0b01100111);
   EXPECT_EQ(data[1], 0b01100010);
   EXPECT_EQ(data[2], 0b01100011);
@@ -43,6 +44,15 @@ TEST_F(Aebrearwheelspeed354Test, reset) {
   EXPECT_EQ(data[5], 0b01010010);
   EXPECT_EQ(data[6], 0b01010011);
   EXPECT_EQ(data[7], 0b01010100);
+
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_valid(),
+            false);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl(), 254.44);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_valid(),
+            false);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr(), 208.18);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rl_direct(), 1);
+  EXPECT_EQ(cd.neolix_edu().aeb_rearwheelspeed_354().wheelspeed_rr_direct(), 1);
 }
 
 }  // namespace neolix_edu

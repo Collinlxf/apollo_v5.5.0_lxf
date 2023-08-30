@@ -15,16 +15,17 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_camera_detection_component.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
 #include "absl/strings/str_cat.h"
-#include "boost/algorithm/string.hpp"
-#include "boost/format.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
@@ -61,6 +62,36 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
     return -1;
   }
   return perception_param.gpu_id();
+}
+
+bool SetCameraHeight(const std::string &sensor_name,
+                     const std::string &params_dir, float default_camera_height,
+                     float *camera_height) {
+  float base_h = default_camera_height;
+  float camera_offset = 0.0f;
+  try {
+    YAML::Node lidar_height =
+        YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
+    base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
+    AINFO << base_h;
+    YAML::Node camera_ex =
+        YAML::LoadFile(params_dir + "/" + sensor_name + "_extrinsics.yaml");
+    camera_offset = camera_ex["transform"]["translation"]["z"].as<float>();
+    AINFO << camera_offset;
+    *camera_height = base_h + camera_offset;
+  } catch (YAML::InvalidNode &in) {
+    AERROR << "load camera extrisic file error, YAML::InvalidNode exception";
+    return false;
+  } catch (YAML::TypedBadConversion<float> &bc) {
+    AERROR << "load camera extrisic file error, "
+           << "YAML::TypedBadConversion exception";
+    return false;
+  } catch (YAML::Exception &e) {
+    AERROR << "load camera extrisic file "
+           << " error, YAML exception:" << e.what();
+    return false;
+  }
+  return true;
 }
 
 // @description: load camera extrinsics from yaml file
@@ -204,7 +235,7 @@ bool FusionCameraDetectionComponent::Init() {
                  &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
-  CHECK(visualize_.Init_all_info_single_camera(
+  ACHECK(visualize_.Init_all_info_single_camera(
       camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
       ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
       image_height_, image_width_));
@@ -250,8 +281,8 @@ void FusionCameraDetectionComponent::OnReceiveImage(
     const double cur_time = apollo::common::time::Clock::NowInSeconds();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
           << "]";
   }
 
@@ -291,8 +322,8 @@ void FusionCameraDetectionComponent::OnReceiveImage(
     const double end_latency =
         (end_timestamp - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
           << "]";
   }
 }
@@ -572,7 +603,7 @@ int FusionCameraDetectionComponent::InitMotionService() {
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
   if (motion_buffer_ == nullptr) {
-    motion_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+    motion_buffer_.reset(new base::MotionBuffer(motion_buffer_size_));
   } else {
     motion_buffer_->set_capacity(motion_buffer_size_);
   }
@@ -1107,46 +1138,6 @@ int FusionCameraDetectionComponent::MakeCameraDebugMsg(
   float pitch_angle = camera_frame.calibration_service->QueryPitchAngle();
   camera_debug_msg->mutable_camera_calibrator()->set_pitch_angle(pitch_angle);
   return cyber::SUCC;
-}
-
-bool FusionCameraDetectionComponent::SetCameraHeight(
-     const std::string &sensor_name,
-     const std::string &params_dir, float default_camera_height,
-     float *camera_height) {
-  float base_h = default_camera_height;
-  float camera_offset = 0.0f;
-
-  apollo::perception::onboard::FusionCameraDetection
-  fusion_camera_detection_param;
-  if (!GetProtoConfig(&fusion_camera_detection_param)) {
-    AINFO << "load fusion camera detection component proto param failed";
-    return false;
-  }
-  std::string lidar_type_name_str =
-      fusion_camera_detection_param.lidar_type_name();
-  try {
-    YAML::Node lidar_height =
-        YAML::LoadFile(params_dir + "/" + lidar_type_name_str + "_height.yaml");
-    base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
-    AINFO << base_h;
-    YAML::Node camera_ex =
-        YAML::LoadFile(params_dir + "/" + sensor_name + "_extrinsics.yaml");
-    camera_offset = camera_ex["transform"]["translation"]["z"].as<float>();
-    AINFO << camera_offset;
-    *camera_height = base_h + camera_offset;
-  } catch (YAML::InvalidNode &in) {
-    AERROR << "load camera extrisic file error, YAML::InvalidNode exception";
-    return false;
-  } catch (YAML::TypedBadConversion<float> &bc) {
-    AERROR << "load camera extrisic file error, "
-           << "YAML::TypedBadConversion exception";
-    return false;
-  } catch (YAML::Exception &e) {
-    AERROR << "load camera extrisic file "
-           << " error, YAML exception:" << e.what();
-    return false;
-  }
-  return true;
 }
 
 }  // namespace onboard
