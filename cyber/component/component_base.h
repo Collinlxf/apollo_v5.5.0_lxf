@@ -59,6 +59,16 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     scheduler::Instance()->RemoveTask(node_->Name());
   }
 
+  /*lxf
+  1. 这段代码是一个 C++ 模板函数，用于从指定的配置文件中加载 Protobuf 格式的配置信息，并将其填充到给定的 config 对象中。
+  2. template <typename T>：这是一个函数模板声明，表示接下来定义的函数是一个模板函数，可以用于不同类型的参数 T。在这里，T 是一个模板类型参数，表示配置对象的类型。
+  3. bool GetProtoConfig(T* config)：这是模板函数的函数签名。它接受一个指向类型为 T 的配置对象的指针 config 作为参数，并返回一个布尔值，指示是否成功加载配置信息。
+  4. bool GetProtoConfig(T* config) const {}函数返回一个布尔值，指示是否成功加载配置信息。如果加载成功，返回 true；否则，返回 false。
+  **5. const表示不会修改类的成员变量：const 成员函数不能修改类的非静态成员变量。在这里，它表示该成员函数不会修改 config_file_path_，即不会修改类的成员变量 config_file_path_ 的值。
+  6. common::GetProtoFromFile(config_file_path_, config)：这是实际的配置加载操作，它调用了一个名为 GetProtoFromFile 的函数，将配置文件 config_file_path_ 中的内容加载到给定的 config 对象中。
+  7. config 是一个已经定义和分配内存空间的 Protobuf 消息对象。在 C++ 中，Protobuf 消息对象是通过 new 或栈上的分配来创建的，因此已经有了足够的内存来存储消息的数据。
+  8. common::GetProtoFromFile(config_file_path_, config) 函数将配置文件的内容解析为 Protobuf 消息，并将数据填充到 config 对象中。这个填充操作不会分配新的内存，而是使用 config 对象已有的内存来存储配置数据。
+  */
   template <typename T>
   bool GetProtoConfig(T* config) const {
     return common::GetProtoFromFile(config_file_path_, config);

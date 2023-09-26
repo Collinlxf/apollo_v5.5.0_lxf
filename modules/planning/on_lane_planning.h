@@ -53,6 +53,7 @@ class OnLanePlanning : public PlanningBase {
   /**
    * @brief module initialization function
    * @return initialization status
+   * 在OnLanePlanning的父类PlanningBase中virtual apollo::common::Status Init(const PlanningConfig& config);被定义为了一个虚函数
    */
   common::Status Init(const PlanningConfig& config) override;
 
