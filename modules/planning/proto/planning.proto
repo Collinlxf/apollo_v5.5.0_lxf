@@ -11,6 +11,12 @@ import "modules/map/proto/map_id.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_internal.proto";
 
+/*
+Planning.proto 的作用是定义规划模块中涉及到的消息结构，以便在规划模块内部和其他模块之间传递和解析数据。
+通过定义这些消息，规划模块可以与其他模块进行通信，传递规划轨迹、任务状态和其他信息，以支持自动驾驶决策和控制。
+这些消息也可用于记录和分析规划过程中的关键数据。
+*/
+
 message EStop {
   // is_estop == true when emergency stop is required
   optional bool is_estop = 1;

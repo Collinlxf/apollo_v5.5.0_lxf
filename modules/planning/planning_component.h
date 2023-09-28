@@ -38,6 +38,13 @@
 namespace apollo {
 namespace planning {
 
+/*
+1. PlanningComponent是通用的模板类（cyber::Component）的实例，其中final表示PlanningComponet类不能在被继承
+2. prediction::PredictionObstacles、canbus::Chassis 和 localization::LocalizationEstimate 是称为泛型参数，因为它们用于定义一个通用的模板类（cyber::Component）的实例。
+3. Init()：用于组件初始化的函数，覆盖了基类的虚函数。
+4. Proc(...)：用于处理输入数据并执行规划的函数，同样覆盖了基类的虚函数。
+5. CheckRerouting() 和 CheckInput()：用于辅助功能的私有函数。
+*/
 class PlanningComponent final
     : public cyber::Component<prediction::PredictionObstacles, canbus::Chassis,
                               localization::LocalizationEstimate> {
@@ -47,6 +54,7 @@ class PlanningComponent final
   ~PlanningComponent() = default;
 
  public:
+  /*override对基类中虚函数的重写*/
   bool Init() override;
 
   bool Proc(const std::shared_ptr<prediction::PredictionObstacles>&
@@ -60,6 +68,12 @@ class PlanningComponent final
   bool CheckInput();
 
  private:
+ /*
+ 1. std::shared_ptr 用于共享通信通道和全局配置/依赖项。
+ 2. std::shared_ptr 表示多个指针可以共享对同一资源的所有权，资源会在最后一个 std::shared_ptr 被销毁时释放。
+ 3. std::shared_ptr 主要用于共享读取器（cyber::Reader）和写入器（cyber::Writer），这些用于与其他模块或组件进行通信，例如接收来自感知模块的交通灯信息或向其他模块发送规划轨迹。
+ 4. 使用 std::shared_ptr 以确保多个模块可以安全地共享这些通信通道。 
+ */
   std::shared_ptr<cyber::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
   std::shared_ptr<cyber::Reader<routing::RoutingResponse>> routing_reader_;
@@ -71,7 +85,10 @@ class PlanningComponent final
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;
   std::shared_ptr<cyber::Writer<PlanningLearningData>>
       planning_learning_data_writer_;
-
+  
+  /*
+  std::unique_ptr 用于独占规划模块的核心组件。
+  */
   std::mutex mutex_;
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
@@ -80,7 +97,12 @@ class PlanningComponent final
   storytelling::Stories stories_;
 
   LocalView local_view_;
-
+  
+  /*
+  1. std::unique_ptr 用于独占规划模块的核心组件。
+  2. std::unique_ptr 的指针被销毁时，它会自动释放资源。
+  3. std::unique_ptr 主要用于 planning_base_，这是规划模块的一个核心组件，它负责实际的规划工作。因为规划模块是独立的，它需要拥有唯一的 planning_base_ 对象，因此使用了 std::unique_ptr。
+  */
   std::unique_ptr<PlanningBase> planning_base_;
   std::shared_ptr<DependencyInjector> injector_;
 

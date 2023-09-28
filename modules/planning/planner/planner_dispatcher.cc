@@ -27,6 +27,22 @@
 namespace apollo {
 namespace planning {
 
+/*
+1. PlannerType 在planning.proto中被声明
+2. void PlannerDispatcher::RegisterPlanners() 是一个注册函数，它在调度器初始化时被调用。它注册了不同类型的规划器，并将每种类型的规划器与一个 lambda 函数关联起来，这个 lambda 函数用于创建对应类型的规划器对象。
+3. PlannerType::RTK 对应的是 RTKReplayPlanner。
+4. PlannerType::PUBLIC_ROAD 对应的是 PublicRoadPlanner。
+5. PlannerType::LATTICE 和 PlannerType::NAVI 就是同样的。
+6. Lambda函数的一般语法如下：
+  [ captures ] ( parameters ) -> return_type {
+    // 函数体
+}
+  captures：捕获列表，用于指定在函数体内使用的外部变量。可以是空的，也可以包含一个或多个外部变量，用逗号分隔。捕获可以按值捕获（复制外部变量的值）或按引用捕获（引用外部变量）。
+  parameters：函数参数列表，类似于普通函数的参数列表。
+  return_type：返回值的类型，可以省略，编译器通常能够自动推断出来。
+  函数体：Lambda函数的实际执行代码。
+7. 
+*/
 void PlannerDispatcher::RegisterPlanners() {
   planner_factory_.Register(
       PlannerType::RTK,

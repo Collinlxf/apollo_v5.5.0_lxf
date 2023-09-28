@@ -27,28 +27,40 @@ message SpeedPoint {
   // jerk (m/s^3)
   optional double da = 5;
 }
-
+/*
+1. Path表示车辆路径、Trajectory表示车辆轨迹
+2. path 用于表示车辆路径上的点，通常只包含位置信息,这些点通常用于描述路径的几何形状，而不包含速度和加速度等信息
+3. trajectory_point 用于表示车辆轨迹上的点，包括位置、速度、加速度等信息。这些点通常用于描述车辆实际行驶的轨迹，包括规划的路径上的点，以及车辆根据规划实际行驶时的状态信息。
+4. 
+*/
 message PathPoint {
   // coordinates
+  //x, y, z 分别表示路径点的三维空间坐标，通常表示车辆在世界坐标系下的位置。
   optional double x = 1;
   optional double y = 2;
   optional double z = 3;
 
   // direction on the x-y plane
+  //theta 表示路径点在平面上的方向角度。
   optional double theta = 4;
   // curvature on the x-y planning
+  //kappa 表示路径点处的曲率，用于描述路径的弯曲程度。
   optional double kappa = 5;
   // accumulated distance from beginning of the path
+  //s 表示从路径的起点开始累积的距离，通常用于表示路径上的位置。
   optional double s = 6;
 
   // derivative of kappa w.r.t s.
+  //dkappa 和 ddkappa 分别表示曲率 kappa 关于累积距离 s 的一阶和二阶导数。
   optional double dkappa = 7;
   // derivative of derivative of kappa w.r.t s.
   optional double ddkappa = 8;
   // The lane ID where the path point is on
+  //lane_id 表示路径点所在的车道的唯一标识。
   optional string lane_id = 9;
 
   // derivative of x and y w.r.t parametric parameter t in CosThetareferenceline
+  // x_derivative 和 y_derivative 表示路径点坐标 x 和 y 分别关于参数 t 的一阶导数。
   optional double x_derivative = 10;
   optional double y_derivative = 11;
 }
@@ -62,17 +74,23 @@ message TrajectoryPoint {
   // path point
   optional PathPoint path_point = 1;
   // linear velocity
+  //v 表示车辆的线性速度，单位为米每秒。
   optional double v = 2;  // in [m/s]
   // linear acceleration
+  //a 表示车辆的线性加速度。
   optional double a = 3;
   // relative time from beginning of the trajectory
+  // relative_time 表示相对于轨迹起点的时间。
   optional double relative_time = 4;
   // longitudinal jerk
+  // da 表示车辆的纵向加速度变化率（纵向 jerk）。
   optional double da = 5;
   // The angle between vehicle front wheel and vehicle longitudinal axis
+  //steer 表示车辆前轮与车辆纵向轴之间的夹角，通常用于描述车辆的转向角度。
   optional double steer = 6;
 
   // Gaussian probability information
+  // gaussian_info 表示轨迹点的高斯概率信息，通常用于概率路径规划。
   optional GaussianInfo gaussian_info = 7;
 }
 

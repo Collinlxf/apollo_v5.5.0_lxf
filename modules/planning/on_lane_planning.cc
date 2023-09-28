@@ -82,10 +82,20 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
                   "planning config error: " + config_.DebugString());
   }
 
+  /*调用基类 PlanningBase 中的初始化函数，进行规划模块的基本初始化工作。*/
   PlanningBase::Init(config_);
-
+  
+  /*
+  1. planner_dispatcher_是类的成员变量，在构造函数中被初始化
+  2. planner_dispatcher_是在基类PlanningBase中被声明的
+  调用 planner_dispatcher_ 对象的 Init 函数，初始化规划器调度器。规划器调度器的作用是根据配置选择合适的规划器来执行规划任务。
+  */
   planner_dispatcher_->Init();
 
+  /*
+  从文件中加载交通规则配置信息，并存储在 traffic_rule_configs_ 中。这些配置信息通常包括了不同交通情境下的规则定义，例如交通信号灯、路权规则等。
+  如果加载配置失败，会产生错误日志。
+  */
   ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "

@@ -20,7 +20,9 @@
 #include <string>
 #include <vector>
 
+//该头文件包含了平滑器（Smoother）的定义和实现。平滑器用于规划模块中的轨迹平滑，它可以使车辆的轨迹更加平滑，以提高驾驶舒适性和安全性。
 #include "modules/planning/common/smoothers/smoother.h"
+//该头文件包含了 OnLanePlannerDispatcher 的定义和实现。OnLanePlannerDispatcher 是规划模块中的一个调度器，负责调度不同的车道规划器（Lane Planner）。它根据不同的交通场景选择合适的车道规划器来生成车辆的路径。
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
 
@@ -39,6 +41,16 @@ namespace planning {
  */
 class OnLanePlanning : public PlanningBase {
  public:
+ /*OnLanePlanning 类继承自 PlanningBase，这是规划模块的基类。
+ 它通过调用 PlanningBase 的构造函数来初始化，并在构造函数中创建了 OnLanePlannerDispatcher 的实例。
+ 1. std::unique_ptr是C++11中引入的
+ 2. std::make_unique是C++14中引入的
+ 3. std::unique_ptr和std::make_unique作用相似，都可用于管理动态分配的对象，以便自动释放内存资源，从而帮助防止内存泄漏。
+ 4. 区别：std::unique_ptr 是一种智能指针类型，用于管理动态分配的对象的所有权，而 std::make_unique 是一个辅助函数，用于创建 std::unique_ptr 指向动态分配的对象的实例。
+ 5. planner_dispatcher_没有在类OnLanePlanning中被显示的申明为成员变量，但是在构造函数中进行初始化，这是一种常见的做法，可以使初始化过程更加清晰和可读。
+ 6. planner_dispatcher_ 被初始化为 std::make_unique<OnLanePlannerDispatcher>()，这表示创建了一个新的 OnLanePlannerDispatcher 对象，并将其存储在 planner_dispatcher_ 中。
+ 7. planner_dispatcher_也是类OnLanePlanning的成员变量
+ */
   explicit OnLanePlanning(const std::shared_ptr<DependencyInjector>& injector)
       : PlanningBase(injector) {
     planner_dispatcher_ = std::make_unique<OnLanePlannerDispatcher>();
