@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * path_time_graph.cc / path_time_graph.h: 实现和定义 PathTimeGraph 类，用于生成路径-时间图，表示在规定时间内车辆可能采取的路径。
  **/
 
 #include "modules/planning/lattice/behavior/path_time_graph.h"

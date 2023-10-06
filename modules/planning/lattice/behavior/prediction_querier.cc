@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * prediction_querier.cc / prediction_querier.h: 实现和定义 PredictionQuerier 类，用于查询其他车辆的预测信息。
  **/
 
 #include "modules/planning/lattice/behavior/prediction_querier.h"

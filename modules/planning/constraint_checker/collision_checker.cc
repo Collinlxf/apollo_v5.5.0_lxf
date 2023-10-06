@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * 该文件可能包含 CollisionChecker 类的实现，用于检查轨迹或路径是否与环境中的障碍物发生碰撞。
  **/
 
 #include "modules/planning/constraint_checker/collision_checker.h"

@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*backup_trajectory_generator.cc / backup_trajectory_generator.h: 实现和定义 BackupTrajectoryGenerator 类，用于生成备选轨迹。*/
 #include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
 
 #include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"

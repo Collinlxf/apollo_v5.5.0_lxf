@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * 该文件可能包含 ConstraintChecker1D 类的实现，用于检查轨迹或路径在某个维度上是否满足约束。
  **/
 
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
