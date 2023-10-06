@@ -16,6 +16,7 @@
 
 /*
  * @file
+ distance_approach_problem.cc 和 distance_approach_problem.h: 距离逼近问题的定义。
  */
 
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"

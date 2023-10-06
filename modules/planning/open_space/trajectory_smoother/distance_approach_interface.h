@@ -16,6 +16,7 @@
 
 /*
  * @file
+ distance_approach_interface.h: 定义距离逼近算法的接口。
  */
 
 #pragma once

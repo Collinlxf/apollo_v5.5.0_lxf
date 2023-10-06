@@ -16,6 +16,7 @@
 
 /*
  * @file
+ distance_approach_ipopt_cuda_interface.cc 和 distance_approach_ipopt_cuda_interface.h: 距离逼近算法的接口实现（使用 CUDA）。
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 

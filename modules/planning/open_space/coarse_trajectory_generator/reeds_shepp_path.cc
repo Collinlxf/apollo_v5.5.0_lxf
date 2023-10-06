@@ -16,6 +16,7 @@
 
 /*
  * @file
+ reeds_shepp_path.cc 和 reeds_shepp_path.h: 包含 Reeds-Shepp 曲线路径生成的代码。
  */
 
 #include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"

@@ -16,6 +16,7 @@
 
 /*
  * @file
+ dual_variable_warm_start_ipopt_qp_interface.cc 和 dual_variable_warm_start_ipopt_qp_interface.h: 使用双变量热启动的距离逼近算法的接口实现（使用 QP 作为子问题求解器）。
  */
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"

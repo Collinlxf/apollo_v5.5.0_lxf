@@ -16,6 +16,7 @@
 
 /*
  * @file
+ distance_approach_ipopt_fixed_dual_interface.cc 和 distance_approach_ipopt_fixed_dual_interface.h: 距离逼近算法的接口实现（使用固定双变量的方法）。
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h"
 namespace apollo {

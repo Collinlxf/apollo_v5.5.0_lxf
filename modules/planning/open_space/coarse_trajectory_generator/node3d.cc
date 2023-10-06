@@ -16,6 +16,7 @@
 
 /*
  * @file
+ node3d.cc 和 node3d.h: 包含与 3D 节点相关的代码。
  */
 
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"

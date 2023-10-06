@@ -16,6 +16,7 @@
 
 /*
  * @file
+ distance_approach_ipopt_relax_end_interface.cc 和 distance_approach_ipopt_relax_end_interface.h: 距离逼近算法的接口实现（使用松弛终点约束）。
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_relax_end_interface.h"
 // #define ADEBUG AERROR

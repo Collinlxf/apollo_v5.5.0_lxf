@@ -16,6 +16,7 @@
 
 /*
  * @file
+ grid_search.cc 和 grid_search.h: 包含用于执行网格搜索的代码。
  */
 
 #include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"

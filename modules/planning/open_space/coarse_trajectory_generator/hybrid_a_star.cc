@@ -16,6 +16,7 @@
 
 /*
  * @file
+ hybrid_a_star.cc 和 hybrid_a_star.h: 包含执行混合 A* 算法的代码。
  */
 
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
