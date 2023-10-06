@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief This file provides the implementation of the class "NaviSpeedTsGraph".
+ * navi_speed_ts_graph.cc：导航速度时间空间图的实现文件。实现了处理导航速度时间空间图的逻辑。
  */
 
 #include "modules/planning/navi/decider/navi_speed_ts_graph.h"

@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief This file provides the implementation of the class "NaviPathDecider".
+ * navi_path_decider.cc：导航路径决策器的实现文件。实现了处理导航路径的逻辑。
  */
 
 #include "modules/planning/navi/decider/navi_path_decider.h"

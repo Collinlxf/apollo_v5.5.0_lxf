@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * navi_task.cc：导航任务的实现文件。包含了处理导航任务的逻辑。
  **/
 
 #include "modules/planning/navi/decider/navi_task.h"

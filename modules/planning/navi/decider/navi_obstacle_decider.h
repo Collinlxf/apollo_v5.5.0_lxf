@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief This file provides the declaration of the class "NaviSpeedDecider".
+ * navi_obstacle_decider.h：导航障碍物决策器的头文件。定义了导航障碍物决策器的类和接口。
  */
 
 #pragma once

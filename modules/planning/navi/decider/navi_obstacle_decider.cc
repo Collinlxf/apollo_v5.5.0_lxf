@@ -18,6 +18,7 @@
  * @file
  * @brief This file provides the implementation of the class
  * "NaviObstacleDecider".
+ * navi_obstacle_decider.cc：导航障碍物决策器的实现文件。这个文件实现了处理导航中的障碍物的具体逻辑。
  */
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 

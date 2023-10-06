@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief This file provides the implementation of the class "NaviSpeedDecider".
+ * navi_speed_decider.cc：导航速度决策器的实现文件。包含处理导航速度的具体逻辑。
  */
 
 #include "modules/planning/navi/decider/navi_speed_decider.h"
