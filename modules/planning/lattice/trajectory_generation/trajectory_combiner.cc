@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+/*trajectory_combiner.cc / trajectory_combiner.h: 实现和定义 TrajectoryCombiner 类，用于组合不同维度的轨迹。*/
 
 #include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
 

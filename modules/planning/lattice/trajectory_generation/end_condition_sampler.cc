@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * end_condition_sampler.cc / end_condition_sampler.h: 实现和定义 EndConditionSampler 类，用于采样轨迹的终止条件。
  **/
 
 #include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"

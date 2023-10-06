@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * lattice_trajectory1d.cc / lattice_trajectory1d.h: 实现和定义 LatticeTrajectory1d 类，用于描述一维（纵向或横向）轨迹的数据结构。
  **/
 
 #include "modules/planning/lattice/trajectory_generation/lattice_trajectory1d.h"

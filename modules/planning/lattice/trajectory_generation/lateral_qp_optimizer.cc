@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*lateral_qp_optimizer.cc / lateral_qp_optimizer.h: 实现和定义 LateralQpOptimizer 类，用于进行横向轨迹优化，采用 QP 优化器。*/
 #include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 
 #include "cyber/common/log.h"

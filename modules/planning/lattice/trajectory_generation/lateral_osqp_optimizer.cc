@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*lateral_osqp_optimizer.cc / lateral_osqp_optimizer.h: 实现和定义 LateralOsqpOptimizer 类，用于进行横向轨迹优化，采用 OSQP 优化器。*/
 #include "modules/planning/lattice/trajectory_generation/lateral_osqp_optimizer.h"
 
 #include "cyber/common/log.h"

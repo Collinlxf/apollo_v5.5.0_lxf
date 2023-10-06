@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * trajectory_evaluator.cc / trajectory_evaluator.h: 实现和定义 TrajectoryEvaluator 类，用于评估轨迹的质量。
  **/
 
 #include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * piecewise_braking_trajectory_generator.cc / piecewise_braking_trajectory_generator.h: 实现和定义 PiecewiseBrakingTrajectoryGenerator 类，用于生成分段制动轨迹。
  **/
 
 #include "modules/planning/lattice/trajectory_generation/piecewise_braking_trajectory_generator.h"

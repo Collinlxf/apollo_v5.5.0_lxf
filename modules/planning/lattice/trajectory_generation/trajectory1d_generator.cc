@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * trajectory1d_generator.cc / trajectory1d_generator.h: 实现和定义 Trajectory1dGenerator 类，用于生成一维轨迹。
  **/
 
 #include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
