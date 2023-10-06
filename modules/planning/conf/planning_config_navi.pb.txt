@@ -1,3 +1,4 @@
+planning_config_navi.pb.txt: 针对导航（navi）场景的 Planning 模块配置文件，可能包含导航场景下的特定参数。
 topic_config {
   chassis_topic: "/apollo/canbus/chassis"
   hmi_status_topic: "/apollo/hmi/status"

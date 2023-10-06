@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * history.cc / history.h: 存储规划历史数据的数据结构。
  **/
 
 #include "modules/planning/common/history.h"

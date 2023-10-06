@@ -14,6 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*
+planning_gflags.cc / planning_gflags.h: 存储规划模块的配置标志。
+*/
 #include "modules/planning/common/planning_gflags.h"
 
 #include <limits>

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * obstacle.cc / obstacle.h: 障碍物相关的数据结构。
  **/
 
 #include "modules/planning/common/obstacle.h"

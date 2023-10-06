@@ -16,6 +16,7 @@
 
 /**
  * @file speed_profile_generator.cc
+ * speed_profile_generator.cc / speed_profile_generator.h: 速度轨迹生成器。
  **/
 
 #include "modules/planning/common/speed_profile_generator.h"

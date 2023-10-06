@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * piecewise_acceleration_trajectory1d.cc / piecewise_acceleration_trajectory1d.h: 实现了一个分段加速度轨迹的类。
  **/
 
 #include "modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.h"

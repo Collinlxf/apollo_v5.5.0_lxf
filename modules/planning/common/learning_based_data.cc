@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/* learning_based_data.cc / learning_based_data.h: 存储学习模型相关的数据。*/
 #include "modules/planning/common/learning_based_data.h"
 
 #include "cyber/common/log.h"

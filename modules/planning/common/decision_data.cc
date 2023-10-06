@@ -12,6 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 该函数功能是存储决策模块的数据结构
  *****************************************************************************/
 
 #include "modules/planning/common/decision_data.h"

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * trajectory_stitcher.cc / trajectory_stitcher.h: 这两个文件实现了轨迹拼接器（TrajectoryStitcher）的功能。轨迹拼接器用于将不同阶段或不同片段生成的轨迹进行拼接，以获得整体连续的轨迹。在规划过程中，可能需要将多个局部轨迹拼接成一个全局轨迹，这就是拼接器的作用。
  **/
 
 #include "modules/planning/common/trajectory_stitcher.h"

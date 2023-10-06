@@ -17,7 +17,7 @@
 /**
  * @file speed_limit.cc
  **/
-
+/* 存储车辆自身信息的数据结构*/
 #include "modules/planning/common/ego_info.h"
 
 #include "cyber/common/log.h"

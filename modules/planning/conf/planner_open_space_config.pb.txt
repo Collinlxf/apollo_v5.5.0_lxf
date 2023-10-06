@@ -1,3 +1,4 @@
+planner_open_space_config.pb.txt: 开放空间规划器的配置文件，配置开放空间规划的参数和行为。
 roi_config {
   roi_longitudinal_range_start: 15.0
   roi_longitudinal_range_end: 15.0

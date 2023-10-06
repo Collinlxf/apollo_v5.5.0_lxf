@@ -1,3 +1,4 @@
+planning_config.pb.txt: Planning 模块的主要配置文件，可能包含核心的规划算法和策略的参数。
 topic_config {
   chassis_topic: "/apollo/canbus/chassis"
   hmi_status_topic: "/apollo/hmi/status"

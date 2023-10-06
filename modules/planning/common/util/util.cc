@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*util.cc / util.h: 通用工具函数。*/
 #include "modules/planning/common/util/util.h"
 
 #include <limits>

@@ -16,6 +16,8 @@
 
 /**
  * @file
+ * smoothers: 存放平滑器相关的文件。
+ * smoother.cc / smoother.h: 平滑器的数据结构。
  **/
 
 #include "modules/planning/common/smoothers/smoother.h"

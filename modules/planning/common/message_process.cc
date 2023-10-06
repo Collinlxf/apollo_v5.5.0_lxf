@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*message_process.cc / message_process.h: 消息处理相关的功能。*/
 #include "modules/planning/common/message_process.h"
 
 #include <algorithm>

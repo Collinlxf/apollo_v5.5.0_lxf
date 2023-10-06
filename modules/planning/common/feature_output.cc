@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*
+ feature_output.cc / feature_output.h: 存储规划模块输出的特征数据。
+*/
 #include "modules/planning/common/feature_output.h"
 
 #include "absl/strings/str_cat.h"

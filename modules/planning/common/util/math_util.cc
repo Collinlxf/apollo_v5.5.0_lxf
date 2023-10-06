@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+/*/*math_util.cc / math_util.h: 数学工具函数。*/*/
 #include "modules/planning/common/util/math_util.h"
 
 #include <utility>

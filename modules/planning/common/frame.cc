@@ -16,6 +16,7 @@
 
 /**
  * @file frame.cc
+ * frame.cc / frame.h: 框架类，用于组织规划模块中的各个组件。
  **/
 #include "modules/planning/common/frame.h"
 

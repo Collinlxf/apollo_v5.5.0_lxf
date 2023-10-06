@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*trajectory_evaluator.cc / trajectory_evaluator.h: 这两个文件实现了轨迹评估器（TrajectoryEvaluator）的功能。轨迹评估器用于评估给定轨迹的质量和适应性，通常涉及到规划模块中对多个轨迹进行比较和评估的任务。*/
 #include "modules/planning/common/trajectory_evaluator.h"
 
 #include <algorithm>

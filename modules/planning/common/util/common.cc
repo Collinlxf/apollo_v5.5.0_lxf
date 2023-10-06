@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*common.cc / common.h: 通用工具函数。*/
 #include "modules/planning/common/util/common.h"
 
 namespace apollo {

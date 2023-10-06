@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*
+1. obstacle_blocking_analyzer.cc / obstacle_blocking_analyzer.h: 障碍物阻塞分析器。
+*/
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 
 #include <algorithm>

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * reference_line_info.cc / reference_line_info.h: 存储参考线信息的数据结构。
  **/
 
 #include "modules/planning/common/reference_line_info.h"

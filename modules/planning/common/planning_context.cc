@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+/*
+planning_context.cc / planning_context.h: 规划上下文，存储规划模块的全局状态。
+*/
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {

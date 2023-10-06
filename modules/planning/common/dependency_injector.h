@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+/*该文件的主要功能是依赖注入器，用于提供规划模块所需的依赖项*/
 #pragma once
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * open_space_info.cc / open_space_info.h: 存储开放空间规划信息的数据结构。
  **/
 
 #include "modules/planning/common/open_space_info.h"

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * constant_jerk_trajectory1d.cc / constant_jerk_trajectory1d.h: 实现了一个常加加速度轨迹的类。
  **/
 
 #include "modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h"

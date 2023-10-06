@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * piecewise_jerk_trajectory1d.cc / piecewise_jerk_trajectory1d.h: 实现了一个分段加加速度轨迹的类。
  **/
 
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
