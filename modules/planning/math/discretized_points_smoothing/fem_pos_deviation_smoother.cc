@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * fem_pos_deviation_smoother.cc 和 fem_pos_deviation_smoother.h：正向偏差有限元法平滑器的实现。
  **/
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"

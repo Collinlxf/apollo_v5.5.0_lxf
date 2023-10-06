@@ -16,6 +16,7 @@
 
 /**
  * @file quintic_polynomial_curve1d.cc
+ * quintic_polynomial_curve1d.cc、quintic_polynomial_curve1d.h 和 quintic_polynomial_curve1d_test.cc：五次多项式曲线的实现。
  **/
 
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"

@@ -16,6 +16,7 @@
 
 /**
  * @file polynomial_curve1d.h
+ * polynomial_curve1d.h：多项式曲线的通用接口。
  **/
 
 #pragma once

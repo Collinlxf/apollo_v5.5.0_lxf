@@ -16,6 +16,7 @@
 
 /**
  * @file discrete_points_math.cc
+ * discrete_points_math.cc 和 discrete_points_math.h：离散点数学计算的实现。
  **/
 
 #include "modules/planning/math/discrete_points_math.h"

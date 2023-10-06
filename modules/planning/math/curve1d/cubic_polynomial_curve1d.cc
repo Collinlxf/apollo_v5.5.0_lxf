@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * cubic_polynomial_curve1d.cc 和 cubic_polynomial_curve1d.h：三次多项式曲线的实现。
  **/
 
 #include "modules/planning/math/curve1d/cubic_polynomial_curve1d.h"

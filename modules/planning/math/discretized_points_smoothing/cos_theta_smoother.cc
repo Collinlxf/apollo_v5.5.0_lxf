@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+
+//cos_theta_smoother.cc 和 cos_theta_smoother.h：余弦角度平滑器的实现。
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_smoother.h"
 
 #include <coin/IpIpoptApplication.hpp>

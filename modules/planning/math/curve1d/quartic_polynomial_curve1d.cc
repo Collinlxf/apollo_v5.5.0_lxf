@@ -16,6 +16,7 @@
 
 /**
  * @file quartic_polynomial_curve1d.cc
+ * quartic_polynomial_curve1d.cc 和 quartic_polynomial_curve1d.h：四次多项式曲线的实现。
  **/
 
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"

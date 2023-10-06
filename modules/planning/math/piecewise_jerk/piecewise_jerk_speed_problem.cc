@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+
+//piecewise_jerk_speed_problem.cc 和 piecewise_jerk_speed_problem.h：分段 Jerk 速度问题的实现。
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 #include "cyber/common/log.h"

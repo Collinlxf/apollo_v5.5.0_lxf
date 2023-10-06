@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * fem_pos_deviation_sqp_osqp_interface.cc 和 fem_pos_deviation_sqp_osqp_interface.h：正向偏差有限元法的 SQP-OSQP 接口。
  **/
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_sqp_osqp_interface.h"

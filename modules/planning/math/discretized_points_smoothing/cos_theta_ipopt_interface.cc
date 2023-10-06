@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+//cos_theta_ipopt_interface.cc 和 cos_theta_ipopt_interface.h：余弦角度的 Ipopt 接口。
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_ipopt_interface.h"
 
 #include <random>

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * fem_pos_deviation_ipopt_interface.cc 和 fem_pos_deviation_ipopt_interface.h：正向偏差有限元法的 Ipopt 接口。
  **/
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"

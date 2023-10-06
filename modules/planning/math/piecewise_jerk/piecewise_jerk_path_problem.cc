@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+//piecewise_jerk_path_problem.cc 和 piecewise_jerk_path_problem.h：分段 Jerk 路径问题的实现。
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
 #include "cyber/common/log.h"

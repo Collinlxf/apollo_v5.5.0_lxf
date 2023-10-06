@@ -16,6 +16,7 @@
 
 /**
  * @file quintic_spiral_path.cpp
+ * quintic_spiral_path.cc、quintic_spiral_path.h 和 quintic_spiral_path_with_derivation.h：五次螺旋路径的实现。
  **/
 
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"

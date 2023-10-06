@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * piecewise_quintic_spiral_path.cc 和 piecewise_quintic_spiral_path.h：分段五次螺旋路径的实现。
  **/
 
 #include "modules/planning/math/curve1d/piecewise_quintic_spiral_path.h"

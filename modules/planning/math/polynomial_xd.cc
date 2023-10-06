@@ -16,6 +16,7 @@
 
 /**
  * @file: polynomial_xd.cc
+ * polynomial_xd.cc 和 polynomial_xd.h：多项式曲线的实现。
  **/
 
 #include "modules/planning/math/polynomial_xd.h"
