@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief This file provides the implementation of the class "NaviPlanner".
+ * 导航（Navi）规划器的实现代码。
  */
 
 #include "modules/planning/planner/navi/navi_planner.h"

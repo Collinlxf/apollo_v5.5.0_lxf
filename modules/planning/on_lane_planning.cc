@@ -61,6 +61,9 @@ using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
 
+/**
+ * 析构函数中这些清理步骤通常是为了确保在对象销毁时释放已分配的资源，以避免内存泄漏或其他资源泄漏。
+ * **/
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
@@ -89,6 +92,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   1. planner_dispatcher_是类的成员变量，在构造函数中被初始化
   2. planner_dispatcher_是在基类PlanningBase中被声明的
   调用 planner_dispatcher_ 对象的 Init 函数，初始化规划器调度器。规划器调度器的作用是根据配置选择合适的规划器来执行规划任务。
+  3. 调用的是planner_dispatcher里面的init
   */
   planner_dispatcher_->Init();
 

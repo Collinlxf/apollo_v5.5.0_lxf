@@ -17,6 +17,7 @@
 /**
  * @file
  * @brief Implementation of the class ReferenceLineProvider.
+ * reference_line_provider.cc: 实现了参考线提供器，可能包括从地图获取参考线等逻辑。
  */
 
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -58,6 +59,13 @@ using apollo::hdmap::RouteSegments;
 
 ReferenceLineProvider::~ReferenceLineProvider() {}
 
+/**
+ * : vehicle_state_provider_(vehicle_state_provider) 是 C++ 中的成员变量初始化列表的语法。
+ *    在这个构造函数中，vehicle_state_provider_ 是一个类成员变量，而 vehicle_state_provider 是构造函数的参数。
+ * vehicle_state_provider_：是车辆状态的提供者，提供当前车辆的位置、速度等信息。
+ * pnc_map_：规划地图，用于在非导航模式下创建参考线。在导航模式下，不使用此地图。
+ * relative_map_：相对地图的共享指针，在导航模式（就是循迹）下使用，提供相对于车辆的地图信息。
+ * **/
 ReferenceLineProvider::ReferenceLineProvider(
     const common::VehicleStateProvider *vehicle_state_provider,
     const hdmap::HDMap *base_map,

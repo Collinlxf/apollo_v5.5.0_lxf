@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * 导航规划器调度器的实现代码。
  **/
 
 #include "modules/planning/planner/navi_planner_dispatcher.h"

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+
+//这个文件实现了对规划轨迹进行评估的功能。通过分析规划轨迹的各个方面，可以进行评估，以确保规划的质量和性能。
 #include <boost/filesystem.hpp>
 
 #include "absl/strings/str_split.h"

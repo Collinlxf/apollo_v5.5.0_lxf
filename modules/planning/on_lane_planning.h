@@ -50,6 +50,10 @@ class OnLanePlanning : public PlanningBase {
  5. planner_dispatcher_没有在类OnLanePlanning中被显示的申明为成员变量，但是在构造函数中进行初始化，这是一种常见的做法，可以使初始化过程更加清晰和可读。
  6. planner_dispatcher_ 被初始化为 std::make_unique<OnLanePlannerDispatcher>()，这表示创建了一个新的 OnLanePlannerDispatcher 对象，并将其存储在 planner_dispatcher_ 中。
  7. planner_dispatcher_也是类OnLanePlanning的成员变量
+ 8. explicit表示这个构造函数是显式的，不允许隐式类型转换。
+ 9. : PlanningBase(injector) 部分就是在调用 OnLanePlanning 构造函数时，先调用了 PlanningBase 的构造函数，并传递了 injector 参数。
+  9.1 OnLanePlanning 是 PlanningBase 的派生类，通过这样的语法，确保了在创建 OnLanePlanning 对象时，先调用 PlanningBase 的构造函数，然后再执行 OnLanePlanning 的构造函数体内的代码。
+  9.2 这种做法是为了确保在派生类对象的构造过程中，先完成基类的初始化，再执行派生类的初始化。这对于确保对象的正确构建是很重要的，尤其是在涉及到继承关系和多层次继承的情况下。
  */
   explicit OnLanePlanning(const std::shared_ptr<DependencyInjector>& injector)
       : PlanningBase(injector) {
@@ -59,6 +63,7 @@ class OnLanePlanning : public PlanningBase {
 
   /**
    * @brief Planning name.
+   * 在C++中，const成员函数表示该成员函数不会修改类的数据成员。而在类的继承关系中，当你在派生类中重新定义（override）一个基类的成员函数时，如果基类的成员函数是const的，那么在派生类中重新定义时也需要带有const关键字，以保持一致性。
    */
   std::string Name() const override;
 

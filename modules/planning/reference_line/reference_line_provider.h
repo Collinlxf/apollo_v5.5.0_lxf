@@ -56,6 +56,32 @@ namespace planning {
  * @brief The class of ReferenceLineProvider.
  *        It provides smoothed reference line to planning.
  */
+/**
+ * 类概述
+   1. 功能：提供平滑的参考线给规划模块使用。
+2. 成员变量：
+    2.1 smoother_：平滑器，用于对参考线进行平滑处理。
+    2.2 pnc_map_：规划地图，用于创建基于路由和当前位置的参考线和相关片段。
+    2.3 relative_map_：相对地图，提供相对于车辆的地图信息。
+    2.4 vehicle_state_：车辆状态，包括车辆位置、速度等信息。
+    2.5 routing_：路由信息，提供规划参考线的路径信息。
+    2.6 reference_lines_：储存计算的参考线。
+    2.7 route_segments_：参考线对应的路段信息。
+    2.8 last_calculation_time_：上次计算参考线的时间。
+3. 主要成员函数
+    3.1 ReferenceLineProvider(): 默认构造函数。
+    3.2 ReferenceLineProvider(...): 带参数的构造函数，用于初始化各种依赖项。
+    3.3 ~ReferenceLineProvider(): 默认析构函数。
+    3.4 UpdateRoutingResponse(const routing::RoutingResponse& routing): 更新路由信息。
+    3.5 UpdateVehicleState(const common::VehicleState& vehicle_state): 更新车辆状态信息。
+    3.6 Start() / Stop(): 启动/停止参考线提供器。
+    3.7 GetReferenceLines(...): 获取平滑的参考线和相关路段。
+    3.8 LastTimeDelay(): 获取上次计算参考线的时间延迟。
+    3.9 FutureRouteWaypoints(): 获取未来路径上的车道信息。
+    3.10 UpdatedReferenceLine(): 判断参考线是否已经更新。
+    3.11 IsValidReferenceLine(): 判断计算的参考线是否有效。
+    3.12 Shrink(...): 根据给定的SL点缩短参考线。
+ * **/
 class ReferenceLineProvider {
  public:
   ReferenceLineProvider() = default;

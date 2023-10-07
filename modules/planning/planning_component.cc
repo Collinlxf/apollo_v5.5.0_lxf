@@ -227,6 +227,8 @@ bool PlanningComponent::Proc(
     return true;
   }
 
+  //ADCTrajectory在planning.proto中
+  //common::util::FillHeader(...): 这是一个填充消息头的辅助函数。在ROS（Robot Operating System）和其他通信系统中，消息头通常包含有关消息的元信息，例如时间戳、发布者的名称等。common::util::FillHeader 函数的作用是填充消息头，以便将一些元信息关联到消息中。
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);

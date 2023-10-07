@@ -16,6 +16,7 @@
 
 /*
  * spiral_reference_line_smoother.cc
+ spiral_reference_line_smoother.cc: 实现了一种使用螺旋轨迹进行参考线平滑的算法。
  */
 
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"

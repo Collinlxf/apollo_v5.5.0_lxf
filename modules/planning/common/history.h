@@ -30,7 +30,9 @@
 
 namespace apollo {
 namespace planning {
-
+/**
+ * ObjectDecisionType在decision.proto中
+ * **/
 class HistoryObjectDecision {
  public:
   HistoryObjectDecision() = default;

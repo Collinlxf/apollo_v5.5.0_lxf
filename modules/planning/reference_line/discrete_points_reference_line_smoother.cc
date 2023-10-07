@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
+//实现了一种使用离散点进行参考线平滑的算法。
 #include "modules/planning/reference_line/discrete_points_reference_line_smoother.h"
 
 #include <algorithm>

@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * reference_line.cc: 实现了参考线的主要逻辑，可能包含参考线的生成、插值、采样等功能。
  **/
 
 #include "modules/planning/reference_line/reference_line.h"

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+
+//这是评估器的实现文件。评估器是一个用于分析和评估规划轨迹的组件，它可能包含各种评估指标和方法。
 #include "modules/planning/pipeline/evaluator.h"
 
 #include <limits>

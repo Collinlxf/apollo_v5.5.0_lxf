@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * Lattice 规划器的实现代码。
  **/
 
 #include "modules/planning/planner/lattice/lattice_planner.h"

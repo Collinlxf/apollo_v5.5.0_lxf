@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * qp_spline_reference_line_smoother.cc: 实现了一种使用二次多项式样条曲线进行参考线平滑的算法。
  **/
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 

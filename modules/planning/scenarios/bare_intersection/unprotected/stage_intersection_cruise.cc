@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * stage_intersection_cruise.cc：处理交叉口巡航阶段的具体实现。
  **/
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_intersection_cruise.h"

@@ -16,6 +16,7 @@
 
 /*
  * spiral_problem_interface.cc
+ spiral_problem_interface.cc: 实现了一个接口，用于描述和解决螺旋轨迹的问题。
  */
 
 #include "modules/planning/reference_line/spiral_problem_interface.h"

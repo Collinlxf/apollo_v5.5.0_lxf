@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * stage_intersection_cruise_impl.cc：交叉口巡航阶段的具体实现。
  **/
 
 #include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"

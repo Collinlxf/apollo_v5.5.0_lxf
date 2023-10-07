@@ -16,6 +16,10 @@
 
 /**
  * @file
+ * unprotected：裸露式交叉口无保护场景相关的文件.
+ * bare_intersection_unprotected_scenario.cc：裸露式交叉口无保护场景的具体实现。
+ * bare_intersection_unprotected_scenario.h：裸露式交叉口无保护场景的头文件。
+ * bare_intersection_unprotected_scenario_test.cc：裸露式交叉口无保护场景的测试文件。
  **/
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"

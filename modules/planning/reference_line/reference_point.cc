@@ -16,6 +16,7 @@
 
 /**
  * @file reference_point.cc
+ * reference_point.cc: 实现了参考线上的一个点，可能包括位置、速度、曲率等信息。
  **/
 
 #include "modules/planning/reference_line/reference_point.h"

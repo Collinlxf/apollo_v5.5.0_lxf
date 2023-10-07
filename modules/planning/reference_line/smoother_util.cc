@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * smoother_util.cc: 包含一些参考线平滑算法中用到的实用工具函数。
  **/
 
 #include "cyber/common/file.h"

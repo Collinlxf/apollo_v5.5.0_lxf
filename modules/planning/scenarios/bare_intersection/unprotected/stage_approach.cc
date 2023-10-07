@@ -16,6 +16,7 @@
 
 /**
  * @file
+ * stage_approach.cc：处理接近阶段的具体实现。
  **/
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_approach.h"

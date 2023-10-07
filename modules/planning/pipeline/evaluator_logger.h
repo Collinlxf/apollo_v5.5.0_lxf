@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+//评估器的日志记录器，用于记录评估结果和相关信息。
+
 #pragma once
 
 #include <fstream>

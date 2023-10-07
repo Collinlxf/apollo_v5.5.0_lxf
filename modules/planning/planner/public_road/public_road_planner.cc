@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+//公共道路规划器的实现代码。
 #include "modules/planning/planner/public_road/public_road_planner.h"
 
 #include "modules/planning/common/planning_gflags.h"
