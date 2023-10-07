@@ -16,6 +16,10 @@
 
 /**
  * @file
+ * stage_slow_down.cc / .h / _test.cc:
+ * stage_slow_down.cc: 紧急停车场景中的"减速"阶段的实现。
+ * stage_slow_down.h: "减速"阶段的类声明和接口。
+ * stage_slow_down_test.cc: 对"减速"阶段进行单元测试的代码。
  **/
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"

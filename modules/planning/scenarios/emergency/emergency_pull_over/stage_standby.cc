@@ -16,6 +16,10 @@
 
 /**
  * @file
+ * stage_standby.cc / .h / _test.cc:
+ * stage_standby.cc: 紧急停车场景中的"待命"阶段的实现。
+ * stage_standby.h: "待命"阶段的类声明和接口。
+ * stage_standby_test.cc: 对"待命"阶段进行单元测试的代码。
  **/
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"

@@ -14,6 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * stage_approach.cc / .h / _test.cc:
+ * stage_approach.cc: 紧急停车场景中的"接近"阶段的实现。
+ * stage_approach.h: "接近"阶段的类声明和接口。
+ * stage_approach_test.cc: 对"接近"阶段进行单元测试的代码。
+**/
+
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 
 #include "cyber/common/file.h"

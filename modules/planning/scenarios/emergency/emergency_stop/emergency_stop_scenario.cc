@@ -16,6 +16,10 @@
 
 /**
  * @file
+ * emergency_stop_scenario.cc / .h / _test.cc:
+ * emergency_stop_scenario.cc: 实现了紧急停车场景的主要逻辑。
+ * emergency_stop_scenario.h: 紧急停车场景的类声明和接口。
+ * emergency_stop_scenario_test.cc: 对紧急停车场景进行单元测试的代码。
  **/
 
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
